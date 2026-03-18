@@ -14,6 +14,18 @@ function love.load()
         RIGHT = "right"
     }
 
+    ANIMATION_FRAME_WIDTH = 32
+    ANIMATION_FRAME_HEIGHT = 32
+    ROW_IDLE = 1
+    ROW_WALK_1 = 2
+    ROW_WALK_2 = 3
+    ANIMATION_DIRECTION_COLUMNS = {
+        UP = 1,
+        RIGHT = 3,
+        DOWN = 5,
+        LEFT = 7
+    }
+
     --
     -- Graphics
     --
@@ -32,6 +44,7 @@ function love.load()
     --
     -- Gameplay
     --
+    player_spritesheet = love.graphics.newImage("orc_spritesheet.png")
     player = {
         sprite = love.graphics.newImage("orc.png"),
         position = {
@@ -41,8 +54,60 @@ function love.load()
         speed = 3,
         target_position = {},
         moving = false,
-        direction = DIRECTIONS.DOWN
+        direction = DIRECTIONS.DOWN,
+        spritesheet = player_spritesheet,
+        animation_frame = 1,
+        animation_timer = 0,
+        animation_speed = 0.2,
+        animations_quads = {
+            idle = {
+                up = {new_quad(player_spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.UP)},
+                right = {new_quad(player_spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.RIGHT)},
+                down = {new_quad(player_spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.DOWN)},
+                left = {new_quad(player_spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.LEFT)}
+            },
+            walk = {
+                up = {
+                    new_quad(player_spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.UP),
+                    new_quad(player_spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.UP),
+                },
+                right = {
+                    new_quad(player_spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.RIGHT),
+                    new_quad(player_spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.RIGHT),
+                },
+                down = {
+                    new_quad(player_spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.DOWN),
+                    new_quad(player_spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.DOWN),
+                },
+                left = {
+                    new_quad(player_spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.LEFT),
+                    new_quad(player_spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.LEFT),
+                },
+            }
+        }
     }
+end
+
+function new_quad(spritesheet, row, column)
+    return love.graphics.newQuad((column - 1) * ANIMATION_FRAME_WIDTH
+                        , (row - 1) * ANIMATION_FRAME_HEIGHT
+                        , ANIMATION_FRAME_WIDTH
+                        , ANIMATION_FRAME_HEIGHT
+                        , spritesheet:getDimensions())
+end
+
+function current_quad()
+    if player.moving then
+        state = 'walk'
+    else
+        state = 'idle'
+    end
+    frames = player.animations_quads[state][player.direction]
+    ff= frames[player.animation_frame]
+    if ff == nil then
+        print("trest")
+    end
+    return ff
 end
 
 --
@@ -80,6 +145,16 @@ function love.update(dt)
     end
 
     if player.moving then
+        player.animation_timer = player.animation_timer + dt
+        if player.animation_timer >= player.animation_speed then
+            player.animation_timer = 0
+            player.animation_frame = player.animation_frame + 1
+
+            if player.animation_frame > 2 then
+                player.animation_frame = 1
+            end
+        end
+        ------
         local move = player.speed * dt
 
         if player.direction == DIRECTIONS.UP then
@@ -94,12 +169,15 @@ function love.update(dt)
 
         if player.position.x == player.target_position.x and player.position.y == player.target_position.y then
             player.moving = false
+            player.animation_frame = 1
+            player.animation_timer = 0
         end
     end
 end
 
 function love.draw()
-    love.graphics.draw(player.sprite, player.position.x * TILE_SIZE, player.position.y * TILE_SIZE)
+    --love.graphics.draw(player.sprite, player.position((.x * TILE_SIZE, player.position.y * TILE_SIZE)
+    love.graphics.draw(player.spritesheet, current_quad(), player.position.x * TILE_SIZE, player.position.y * TILE_SIZE)
 
     love.graphics.draw(tree, 400, 300)
 end
