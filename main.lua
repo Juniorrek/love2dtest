@@ -30,9 +30,10 @@ function love.load()
     -- Graphics
     --
     tree = love.graphics.newImage("tree.png")
+    bush = love.graphics.newImage("bush.png")
 
     love.graphics.setNewFont(12)
-    love.graphics.setColor(0,0,0)
+    --love.graphics.setColor(0,0,0)
     love.graphics.setBackgroundColor(4, 11, 3)
 
     --
@@ -93,14 +94,14 @@ function love.load()
     --
     tilemap = {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
+        {1, 0, 0, 1, 0, 0, 0, 2, 5, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 3, 4, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 5, 2, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
@@ -130,6 +131,19 @@ function current_quad()
     return ff
 end
 
+function movable_tile(x, y)
+    return tilemap[y][x] == 0
+end
+
+function move(x, y, direction)
+    if movable_tile(x, y) then
+        player.target_position.x = x
+        player.target_position.y = y
+        player.direction = direction
+        player.moving = true
+    end
+end
+
 --
 -- Gameloop
 --
@@ -142,25 +156,13 @@ end
 function love.update(dt)
     if not player.moving then
         if love.keyboard.isDown("up") or love.keyboard.isDown("w") then
-            player.target_position.x = player.position.x
-            player.target_position.y = player.position.y - 1
-            player.direction = DIRECTIONS.UP
-            player.moving = true
+            move(player.position.x, player.position.y - 1, DIRECTIONS.UP)
         elseif love.keyboard.isDown("left") or love.keyboard.isDown("a") then
-            player.target_position.x = player.position.x - 1
-            player.target_position.y = player.position.y
-            player.direction = DIRECTIONS.LEFT
-            player.moving = true
+            move(player.position.x - 1, player.position.y, DIRECTIONS.LEFT)
         elseif love.keyboard.isDown("down") or love.keyboard.isDown("s") then
-            player.target_position.x = player.position.x
-            player.target_position.y = player.position.y + 1
-            player.direction = DIRECTIONS.DOWN
-            player.moving = true
+            move(player.position.x, player.position.y + 1, DIRECTIONS.DOWN)
         elseif love.keyboard.isDown("right") or love.keyboard.isDown("d") then
-            player.target_position.x = player.position.x + 1
-            player.target_position.y = player.position.y
-            player.direction = DIRECTIONS.RIGHT
-            player.moving = true
+            move(player.position.x + 1, player.position.y, DIRECTIONS.RIGHT)
         end
     end
 
@@ -199,24 +201,30 @@ function love.draw()
     --love.graphics.draw(player.sprite, player.position((.x * TILE_SIZE, player.position.y * TILE_SIZE)
     love.graphics.draw(player.spritesheet, current_quad(), player.position.x * TILE_SIZE, player.position.y * TILE_SIZE)
 
-    love.graphics.draw(tree, 256, 256)
-
-    --for i,v in ipairs(tilemap) do
-    --    if v == 1 then
-    --        love.graphics.rectangle("line", i * 32, 128, 32, 32)
-    --    end
-    --end
-
-    for i=1,#tilemap do
-        --For j till the number of values in this row
-        for j=1,#tilemap[i] do
-            --If the value on row i, column j equals 1
-            if tilemap[i][j] == 1 then
-                --Draw the rectangle.
-                --Use i and j to position the rectangle.
-                -- j for x, i for y.
-                love.graphics.rectangle("line", j * 32, i * 32, 32, 32)
-            end 
+    for i, row in ipairs(tilemap) do
+        for j, tile in ipairs(row) do
+            if tile ~= 0 then
+                if tile == 1 then
+                    love.graphics.setColor(1, 1, 1)
+                    love.graphics.draw(bush, j * 32, i * 32)
+                elseif tile == 2 then
+                    love.graphics.setColor(1, 0, 0)
+                    love.graphics.rectangle("fill", j * 32, i * 32, 32, 32)
+                elseif tile == 3 then
+                    love.graphics.setColor(1, 0, 1)
+                    love.graphics.rectangle("fill", j * 32, i * 32, 32, 32)
+                elseif tile == 4 then
+                    love.graphics.setColor(0, 0, 1)
+                    love.graphics.rectangle("fill", j * 32, i * 32, 32, 32)
+                elseif tile == 5 then
+                    love.graphics.setColor(0, 1, 1)
+                    love.graphics.rectangle("fill", j * 32, i * 32, 32, 32)
+                end
+            else
+                love.graphics.setColor(1, 1, 1)
+            end
         end
     end
+    
+    love.graphics.draw(tree, 256, 256)
 end
