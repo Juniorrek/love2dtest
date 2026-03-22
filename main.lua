@@ -21,9 +21,9 @@ function love.load()
     ROW_WALK_2 = 3
     ANIMATION_DIRECTION_COLUMNS = {
         UP = 1,
-        RIGHT = 3,
-        DOWN = 5,
-        LEFT = 7
+        RIGHT = 2,
+        DOWN = 3,
+        LEFT = 4
     }
 
     --
@@ -32,7 +32,7 @@ function love.load()
     tree = love.graphics.newImage("tree.png")
 
     love.graphics.setNewFont(12)
-    --love.graphics.setColor(0,0,0)
+    love.graphics.setColor(0,0,0)
     love.graphics.setBackgroundColor(4, 11, 3)
 
     --
@@ -42,7 +42,7 @@ function love.load()
     love.audio.play(sound)
 
     --
-    -- Gameplay
+    -- Player
     --
     player_spritesheet = love.graphics.newImage("orc_spritesheet.png")
     player = {
@@ -86,11 +86,31 @@ function love.load()
             }
         }
     }
+
+    
+    --
+    -- Map
+    --
+    tilemap = {
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+    }
 end
 
 function new_quad(spritesheet, row, column)
-    return love.graphics.newQuad((column - 1) * ANIMATION_FRAME_WIDTH
-                        , (row - 1) * ANIMATION_FRAME_HEIGHT
+    return love.graphics.newQuad(1 + (column - 1) * ANIMATION_FRAME_WIDTH + (column - 1) * 1
+                        , 1 + (row - 1) * ANIMATION_FRAME_HEIGHT  + (row - 1) * 1
                         , ANIMATION_FRAME_WIDTH
                         , ANIMATION_FRAME_HEIGHT
                         , spritesheet:getDimensions())
@@ -179,5 +199,24 @@ function love.draw()
     --love.graphics.draw(player.sprite, player.position((.x * TILE_SIZE, player.position.y * TILE_SIZE)
     love.graphics.draw(player.spritesheet, current_quad(), player.position.x * TILE_SIZE, player.position.y * TILE_SIZE)
 
-    love.graphics.draw(tree, 400, 300)
+    love.graphics.draw(tree, 256, 256)
+
+    --for i,v in ipairs(tilemap) do
+    --    if v == 1 then
+    --        love.graphics.rectangle("line", i * 32, 128, 32, 32)
+    --    end
+    --end
+
+    for i=1,#tilemap do
+        --For j till the number of values in this row
+        for j=1,#tilemap[i] do
+            --If the value on row i, column j equals 1
+            if tilemap[i][j] == 1 then
+                --Draw the rectangle.
+                --Use i and j to position the rectangle.
+                -- j for x, i for y.
+                love.graphics.rectangle("line", j * 32, i * 32, 32, 32)
+            end 
+        end
+    end
 end
