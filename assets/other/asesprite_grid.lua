@@ -171,8 +171,8 @@ dlg:button {
             local pxItr = cellImage:pixels()
             for pixel in pxItr do
                 local hex = bHex
-                if (((pixel.x // sizeChecker)
-                    + (pixel.y // sizeChecker)) % 2) ~= 1 then
+                if (((math.floor(pixel.x / sizeChecker))
+                    + (math.floor(pixel.y / sizeChecker))) % 2) ~= 1 then
                     hex = aHex
                 end
                 pixel(hex)
