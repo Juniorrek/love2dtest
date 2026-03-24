@@ -30,8 +30,8 @@ function love.load()
     --
     -- Graphics
     --
-    tree = love.graphics.newImage("tree.png")
-    bush = love.graphics.newImage("bush.png")
+    tree = love.graphics.newImage("assets/images/objects/nature/tree.png")
+    bush = love.graphics.newImage("assets/images/objects/nature/bush.png")
 
     love.graphics.setNewFont(12)
     --love.graphics.setColor(0,0,0)
@@ -40,15 +40,14 @@ function love.load()
     --
     -- Audio
     --
-    sound = love.audio.newSource("meadow_ambience.ogg", "stream")
+    sound = love.audio.newSource("assets/audio/music/meadow_ambience.ogg", "stream")
     love.audio.play(sound)
 
     --
     -- Player
     --
-    player_spritesheet = love.graphics.newImage("orc_spritesheet.png")
+    player_spritesheet = love.graphics.newImage("assets/images/player/orc_spritesheet.png")
     player = {
-        sprite = love.graphics.newImage("orc.png"),
         position = {
             x = 10,
             y = 10
