@@ -145,6 +145,18 @@ function move(x, y, direction)
     end
 end
 
+function handle_player_input()
+    if love.keyboard.isDown("up") or love.keyboard.isDown("w") then
+        move(player.position.x, player.position.y - 1, DIRECTIONS.UP)
+    elseif love.keyboard.isDown("left") or love.keyboard.isDown("a") then
+        move(player.position.x - 1, player.position.y, DIRECTIONS.LEFT)
+    elseif love.keyboard.isDown("down") or love.keyboard.isDown("s") then
+        move(player.position.x, player.position.y + 1, DIRECTIONS.DOWN)
+    elseif love.keyboard.isDown("right") or love.keyboard.isDown("d") then
+        move(player.position.x + 1, player.position.y, DIRECTIONS.RIGHT)
+    end
+end
+
 --
 -- Gameloop
 --
@@ -156,15 +168,7 @@ end
 
 function love.update(dt)
     if not player.moving then
-        if love.keyboard.isDown("up") or love.keyboard.isDown("w") then
-            move(player.position.x, player.position.y - 1, DIRECTIONS.UP)
-        elseif love.keyboard.isDown("left") or love.keyboard.isDown("a") then
-            move(player.position.x - 1, player.position.y, DIRECTIONS.LEFT)
-        elseif love.keyboard.isDown("down") or love.keyboard.isDown("s") then
-            move(player.position.x, player.position.y + 1, DIRECTIONS.DOWN)
-        elseif love.keyboard.isDown("right") or love.keyboard.isDown("d") then
-            move(player.position.x + 1, player.position.y, DIRECTIONS.RIGHT)
-        end
+        handle_player_input()
     end
 
     if player.moving then
@@ -194,6 +198,8 @@ function love.update(dt)
             player.moving = false
             player.animation_frame = 1
             player.animation_timer = 0
+
+            handle_player_input()
         end
     end
 end
