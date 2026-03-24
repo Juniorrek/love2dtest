@@ -3,6 +3,7 @@ if arg[2] == "debug" then
 end
 
 function love.load()
+    love.graphics.setDefaultFilter("nearest", "nearest")
     --
     -- Constants
     --
@@ -111,7 +112,7 @@ end
 
 function new_quad(spritesheet, row, column)
     return love.graphics.newQuad(1 + (column - 1) * ANIMATION_FRAME_WIDTH + (column - 1) * 1
-                        , 1 + (row - 1) * ANIMATION_FRAME_HEIGHT  + (row - 1) * 1
+                        , 1 + (row - 1) * ANIMATION_FRAME_HEIGHT + (row - 1) * 1
                         , ANIMATION_FRAME_WIDTH
                         , ANIMATION_FRAME_HEIGHT
                         , spritesheet:getDimensions())
