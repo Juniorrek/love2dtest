@@ -28,6 +28,8 @@ end
 
 function map.removeAt(x, y)
     map.tilemap[y][x] = 0
+    local ambienceSound = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
+    love.audio.play(ambienceSound)
 end
 
 function map.draw()
