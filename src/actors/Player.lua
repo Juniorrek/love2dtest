@@ -92,10 +92,10 @@ function Player.new()
     end
 
     function player:tryMove(x, y, direction)
+        self.direction = direction
         if map.movableTile(x, y) then
             self.targetPosition.x = x
             self.targetPosition.y = y
-            self.direction = direction
             self.moving = true
         end
     end
