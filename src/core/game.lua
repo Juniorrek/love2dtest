@@ -20,6 +20,8 @@ function game.keypressed(key)
     if key == "escape" then
         love.event.quit()
     end
+
+    player:handleKeyPressed(key)
 end
 
 function game.update(dt)
@@ -27,9 +29,8 @@ function game.update(dt)
 end
 
 function game.draw()
-    map.draw()
-    nature.draw()
     player:draw()
+    map.draw()
 end
 
 return game

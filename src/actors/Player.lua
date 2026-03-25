@@ -150,6 +150,27 @@ function Player.new()
         end
     end
 
+    function player:lookingAt()
+        if self.direction == constants.DIRECTIONS.UP then
+            return { x = self.position.x, y = self.position.y - 1}
+        elseif self.direction == constants.DIRECTIONS.RIGHT then
+            return { x = self.position.x + 1, y = self.position.y}
+        elseif self.direction == constants.DIRECTIONS.DOWN then
+            return { x = self.position.x, y = self.position.y + 1}
+        elseif self.direction == constants.DIRECTIONS.LEFT then
+            return { x = self.position.x - 1, y = self.position.y}
+        end
+    end
+
+    function player:handleKeyPressed(key)
+        if key == "space" then
+            local lookingAt = self:lookingAt()
+            if map.hasTreeAt(lookingAt.x, lookingAt.y) then
+                map.removeAt(lookingAt.x, lookingAt.y)
+            end
+        end
+    end
+
     function player:draw()
         love.graphics.draw(
             self.spritesheet,
