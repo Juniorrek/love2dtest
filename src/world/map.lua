@@ -2,7 +2,7 @@ local nature = require("src.objects.nature")
 
 local map = {}
 
-function map.movable_tile(x, y)
+function map.movableTile(x, y)
     return map.tilemap[y][x] == 0
 end
 

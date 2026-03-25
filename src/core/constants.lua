@@ -1,6 +1,6 @@
 local constants = {}
 
-constants.TILESIZE = 32
+constants.TILE_SIZE = 32
 
 constants.DIRECTIONS = {
     UP = "up",

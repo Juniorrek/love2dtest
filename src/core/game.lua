@@ -1,17 +1,19 @@
-local constants = require("src.core.constants")
-local player = require("src.actors.player")
+local Player = require("src.actors.Player")
 local nature = require("src.objects.nature")
 local map = require("src.world.map")
 
 local game = {}
 
+local player
+
 function game.load()
     love.graphics.setDefaultFilter("nearest", "nearest")
-
     love.graphics.setBackgroundColor(0, 0.7, 1)
 
-    sound = love.audio.newSource("assets/audio/music/meadow_ambience.ogg", "stream")
-    love.audio.play(sound)
+    local ambienceSound = love.audio.newSource("assets/audio/music/meadowAmbience.ogg", "stream")
+    love.audio.play(ambienceSound)
+
+    player = Player.new()
 end
 
 function game.keypressed(key)
@@ -21,15 +23,13 @@ function game.keypressed(key)
 end
 
 function game.update(dt)
-    player.update(dt)
+    player:update(dt)
 end
 
 function game.draw()
-    player.draw()
-
     map.draw()
-    
     nature.draw()
+    player:draw()
 end
 
 return game
