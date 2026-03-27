@@ -164,9 +164,11 @@ function Player.new()
 
     function player:handleKeyPressed(key)
         if key == "space" then
-            local lookingAt = self:lookingAt()
-            if map.hasTreeAt(lookingAt.x, lookingAt.y) then
-                map.removeAt(lookingAt.x, lookingAt.y)
+            if not self.moving then
+                local lookingAt = self:lookingAt()
+                if map.hasTreeAt(lookingAt.x, lookingAt.y) then
+                    map.removeAt(lookingAt.x, lookingAt.y)
+                end
             end
         end
     end
