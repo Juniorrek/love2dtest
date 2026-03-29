@@ -1,62 +1,45 @@
 local nature = require("src.objects.nature")
 
+local sti = require("libraries.sti")
+
 local map = {}
 
-map.tilemap = {
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 2, 0, 1, 0, 0, 0, 2, 5, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 3, 4, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 5, 2, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1},
-    {1, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 2, 0, 0, 1, 0, 0, 2, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-}
+function map.load()
+    map.tilemap = sti("assets/map.lua")
+end
+
+local chopTreeSfx = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
 
 function map.movableTile(x, y)
-    return map.tilemap[y][x] == 0
+    return map.tilemap.layers["Collision"].data[y][x] == nil
 end
 
 function map.hasTreeAt(x, y)
-    return map.tilemap[y][x] == 2
+    if map.tilemap.layers["Nature.Nature"].data[y][x] == nil then
+        return false
+    end
+    return map.tilemap.layers["Nature.Nature"].data[y][x].id == nature.tiles.TREE
 end
 
 function map.removeAt(x, y)
-    map.tilemap[y][x] = 0
-    local ambienceSound = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
-    love.audio.play(ambienceSound)
+    map.tilemap:setLayerTile("Nature.Nature", x, y, 0)
+
+    map.tilemap:setLayerTile("Nature.Above Nature", x, y-1, 0)
+    map.tilemap:setLayerTile("Nature.Above Nature", x-1, y-1, 0)
+    map.tilemap:setLayerTile("Nature.Above Nature", x-1, y, 0)
+
+    map.tilemap:setLayerTile("Collision", x, y, 0)
+
+    love.audio.play(chopTreeSfx)
 end
 
-function map.draw()
-    for y, row in ipairs(map.tilemap) do
-        for x, tile in ipairs(row) do
-            if tile ~= 0 then
-                if tile == 1 then
-                    love.graphics.setColor(1, 1, 1)
-                    love.graphics.draw(nature.bush, x * 32, y * 32)
-                elseif tile == 2 then
-                    love.graphics.setColor(1, 1, 1)
-                    nature.draw(tile, x, y)
-                elseif tile == 3 then
-                    love.graphics.setColor(1, 0, 1)
-                    love.graphics.rectangle("fill", x * 32, y * 32, 32, 32)
-                elseif tile == 4 then
-                    love.graphics.setColor(0, 0, 1)
-                    love.graphics.rectangle("fill", x * 32, y * 32, 32, 32)
-                elseif tile == 5 then
-                    love.graphics.setColor(0, 1, 1)
-                    love.graphics.rectangle("fill", x * 32, y * 32, 32, 32)
-                end
-            else
-                love.graphics.setColor(1, 1, 1)
-            end
-        end
-    end
+function map.drawGround()
+    map.tilemap:drawTileLayer("Ground")
+    map.tilemap:drawTileLayer("Nature.Nature")
+end
+
+function map.drawAbove()
+    map.tilemap:drawTileLayer("Nature.Above Nature")
 end
 
 return map

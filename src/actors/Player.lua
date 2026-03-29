@@ -67,13 +67,13 @@ function Player.new()
     -- TABLE INSTANCE
     local player = {
         position = {
-            x = 10,
-            y = 10
+            x = 4,
+            y = 4
         },
-        speed = 3,
+        speed = 4,
         targetPosition = {
-            x = 10,
-            y = 10
+            x = 4,
+            y = 4
         },
         moving = false,
         direction = constants.DIRECTIONS.DOWN,
@@ -177,8 +177,8 @@ function Player.new()
         love.graphics.draw(
             self.spritesheet,
             self:getCurrentQuad(),
-            self.position.x * constants.TILE_SIZE,
-            self.position.y * constants.TILE_SIZE
+            (self.position.x-1) * constants.TILE_SIZE,
+            (self.position.y-1) * constants.TILE_SIZE
         )
     end
 
