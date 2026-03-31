@@ -1,6 +1,7 @@
 -- MODULE DEPENDENCIES
 local constants = require("src.core.constants")
 local map = require("src.world.map")
+local nature = require("src.objects.nature")
 
 -- MODULE
 local Player = {}
@@ -81,7 +82,8 @@ function Player.new()
         animationFrame = 1,
         animationTimer = 0,
         animationSpeed = 0.2,
-        animationsQuads = buildAnimations(spritesheet)
+        animationsQuads = buildAnimations(spritesheet),
+        branches = 0
     }
 
     -- METHODS
@@ -167,7 +169,10 @@ function Player.new()
             if not self.moving then
                 local lookingAt = self:lookingAt()
                 if map.hasTreeAt(lookingAt.x, lookingAt.y) then
+                    map.removeTreeAt(lookingAt.x, lookingAt.y)
+                elseif map.hasTileAt(nature.tiles.BRANCH, lookingAt.x, lookingAt.y) then
                     map.removeAt(lookingAt.x, lookingAt.y)
+                    player.branches = player.branches + 1
                 end
             end
         end
@@ -180,6 +185,8 @@ function Player.new()
             (self.position.x-1) * constants.TILE_SIZE,
             (self.position.y-1) * constants.TILE_SIZE
         )
+
+        love.graphics.print("Branches: " .. player.branches)
     end
 
     return player
