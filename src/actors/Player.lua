@@ -83,7 +83,8 @@ function Player.new()
         animationTimer = 0,
         animationSpeed = 0.2,
         animationsQuads = buildAnimations(spritesheet),
-        branches = 0
+        branches = 0,
+        stones = 0
     }
 
     -- METHODS
@@ -167,12 +168,16 @@ function Player.new()
     function player:handleKeyPressed(key)
         if key == "space" then
             if not self.moving then
+                --TODO looking at return the upper object ID
                 local lookingAt = self:lookingAt()
                 if map.hasTreeAt(lookingAt.x, lookingAt.y) then
                     map.removeTreeAt(lookingAt.x, lookingAt.y)
                 elseif map.hasTileAt(nature.tiles.BRANCH, lookingAt.x, lookingAt.y) then
-                    map.removeAt(lookingAt.x, lookingAt.y)
+                    map.removeTileAt(lookingAt.x, lookingAt.y)
                     player.branches = player.branches + 1
+                elseif map.hasAt(nature.tiles.STONE, lookingAt.x, lookingAt.y) then
+                    map.removeAt(nature.tiles.STONE, lookingAt.x, lookingAt.y)
+                    player.stones = player.stones + 1
                 end
             end
         end
@@ -186,7 +191,7 @@ function Player.new()
             (self.position.y-1) * constants.TILE_SIZE
         )
 
-        love.graphics.print("Branches: " .. player.branches)
+        love.graphics.print("Branches: " .. player.branches .. " | Stones: " .. player.stones)
     end
 
     return player
