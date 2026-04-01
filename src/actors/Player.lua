@@ -104,7 +104,20 @@ function Player.new()
     end
 
     function player:handleInput()
-        if love.keyboard.isDown("up") or love.keyboard.isDown("w") then
+        if love.keyboard.isDown("lctrl") 
+            and (love.keyboard.isDown("up") or love.keyboard.isDown("w")) then
+            self.direction = constants.DIRECTIONS.UP
+        elseif love.keyboard.isDown("lctrl") 
+            and (love.keyboard.isDown("left") or love.keyboard.isDown("a")) then
+            self.direction = constants.DIRECTIONS.LEFT
+        elseif love.keyboard.isDown("lctrl") 
+            and (love.keyboard.isDown("down") or love.keyboard.isDown("s")) then
+            self.direction = constants.DIRECTIONS.DOWN
+        elseif love.keyboard.isDown("lctrl") 
+            and (love.keyboard.isDown("right") or love.keyboard.isDown("d")) then
+            self.direction = constants.DIRECTIONS.RIGHT
+        -------------------
+        elseif love.keyboard.isDown("up") or love.keyboard.isDown("w") then
             self:tryMove(self.position.x, self.position.y - 1, constants.DIRECTIONS.UP)
         elseif love.keyboard.isDown("left") or love.keyboard.isDown("a") then
             self:tryMove(self.position.x - 1, self.position.y, constants.DIRECTIONS.LEFT)
