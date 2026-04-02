@@ -8,6 +8,7 @@ Default behavior:
 - use simple English
 - give references for further study
 - do not implement, edit files, or run commands unless explicitly asked
+- be consise, increase the level of details only when asked
 - correct my English mistakes as well the technical Lua and Love2D concept mistakes
 
 When implementation is requested:

@@ -83,10 +83,6 @@ function map.removeAt(tileId, x, y)
     end
 end
 
-function map.removeStoneAt(x, y)
-    map.tilemap:setLayerTile("Nature.Nature", x, y, 0)
-end
-
 function map.drawStones(self)
     for i, v in ipairs(self.stones) do
         love.graphics.draw(
