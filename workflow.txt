@@ -1,0 +1,21 @@
+Mode 1: Study mode
+
+Ask things like:
+
+“Explain game state management in Love2D. No code yet.”
+“Teach me how entity update/draw separation works.”
+“Explain pros and cons of storing trees in the map versus in a separate table.”
+Mode 2: Guided code mode
+
+Ask:
+
+“Implement this, but first explain the plan.”
+“Review my code and point out mistakes, but do not rewrite it yet.”
+“Suggest only the next small step.”
+Mode 3: Execution mode
+
+Only when you really want it:
+
+“Make the change directly.”
+“Refactor this file.”
+“Generate the first version of this system.”
