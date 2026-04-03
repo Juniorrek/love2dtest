@@ -2,11 +2,15 @@ local items = require("src.items.items")
 
 local Inventory = {}
 
-function Inventory.new(maxSize)
+function Inventory.new(maxSize, equipItem)
     local inventory = {
         slots = {},
         max = maxSize
     }
+
+    local X_INV = (love.graphics.getWidth() - (inventory.max*32))/2 -- center
+            
+    local Y_INV = love.graphics.getHeight() - 50
 
     function inventory:hasItem(item)
 
@@ -46,9 +50,9 @@ function Inventory.new(maxSize)
                         slot.qnt = slot.qnt - qntRemove
                         qntRemove = 0
                     else
-                        slot.qnt = 0
                         qntRemove = qntRemove - slot.qnt
-                        slot = nil
+                        slot.qnt = 0
+                        self.slots[j] = nil
                     end
                 end
 
@@ -91,32 +95,51 @@ function Inventory.new(maxSize)
     function inventory:addItems(rewards)
         for k, rew in pairs(rewards) do
             local nextSlot = self:nextSlotAvailable()
-            self.inventory[nextSlot] = rew
+            self.slots[nextSlot] = rew
+        end
+    end
+
+    function inventory:handleMousepressed(x, y, button)
+        --TODO +32 ESQUISITO
+        if x > X_INV+32 and x < X_INV + inventory.max*32+32 and y > Y_INV and y < Y_INV + 32 then
+            local diff = x-(X_INV+32)
+            local slotClicked = (math.floor((diff+32)/32))
+            
+            if self.slots[slotClicked] ~= nil then
+                if self.slots[slotClicked].id == items.axe.id then-- TODO REMOVE PLAYER  FAZ
+                    equipItem(slotClicked)
+                end
+            end
         end
     end
 
     function inventory:draw()
         for i = 1, self.max do
-            local x = (love.graphics.getWidth() - (self.max*32))/2 -- center
-                    + (32*i) --per slot offset
-            local y = love.graphics.getHeight() - 50
+            local X_INV_OFF = X_INV + (32*i) --per slot offset
 
-            love.graphics.rectangle("line", x, y, 32, 32)
+            love.graphics.rectangle("line", X_INV_OFF, Y_INV, 32, 32)
 
             if self.slots[i] then
                 if self.slots[i].id == items.stone.id then
                     love.graphics.draw(
                         items.stone.spritesheet,
                         items.stone.sptsQuad,
-                        x,
-                        y
+                        X_INV_OFF,
+                        Y_INV
                     )
                 elseif self.slots[i].id == items.branch.id then
                     love.graphics.draw(
                         items.branch.spritesheet,
                         items.branch.sptsQuad,
-                        x,
-                        y
+                        X_INV_OFF,
+                        Y_INV
+                    )
+                elseif self.slots[i].id == items.axe.id then
+                    love.graphics.draw(
+                        items.axe.spritesheet,
+                        items.axe.sptsQuad,
+                        X_INV_OFF,
+                        Y_INV
                     )
                 end
             end

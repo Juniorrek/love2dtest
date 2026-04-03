@@ -6,6 +6,7 @@ local Recipes = require("src.items.recipes")
 local Inventory = require("src.actors.Inventory")
 local items = require("src.items.items")
 local util = require("src.util.util")
+local Equipment = require("src.actors.Equipment")
 
 -- MODULE
 local Player = {}
@@ -78,10 +79,18 @@ function Player.new()
         animationTimer = 0,
         animationSpeed = 0.2,
         animationsQuads = buildAnimations(spritesheet),
-        inventory = Inventory.new(5)
+        equipment = Equipment.new()
     }
 
     -- METHODS
+    function player:equipItem(slot)
+        --[[ if self.inventory.slots[slot].id == items.axe.id then
+            print("clicou machado")
+        end ]]
+    end
+
+    player.inventory = Inventory.new(5, player:equipItem())
+
     function player:getCurrentQuad()
         local state = self.moving and "walk" or "idle"
         local frames = self.animationsQuads[state][self.direction]
@@ -188,12 +197,14 @@ function Player.new()
                 if map.hasTreeAt(lookingAt.x, lookingAt.y) then
                     map.removeTreeAt(lookingAt.x, lookingAt.y)
                 elseif map.hasTileAt(nature.tiles.BRANCH, lookingAt.x, lookingAt.y) then
-                    map.removeTileAt(lookingAt.x, lookingAt.y)
+                    if self.inventory:hasFreeSlots(1) then
+                        map.removeTileAt(lookingAt.x, lookingAt.y)
 
-                    self.inventory:addItem({
-                        id = items.branch.id,
-                        qnt = 1
-                    })
+                        self.inventory:addItem({
+                            id = items.branch.id,
+                            qnt = 1
+                        })
+                    end
                 elseif map.hasAt(nature.tiles.STONE, lookingAt.x, lookingAt.y) then
                     if self.inventory:hasFreeSlots(1) then
                         map.removeAt(nature.tiles.STONE, lookingAt.x, lookingAt.y)
@@ -208,6 +219,10 @@ function Player.new()
         end
     end
 
+    function player:handleMousepressed(x, y, button)
+        self.inventory:handleMousepressed(x, y, button)
+    end
+
     function player:draw()
         love.graphics.draw(
             self.spritesheet,
@@ -217,18 +232,19 @@ function Player.new()
         )
 
         self.inventory:draw()
+        self.equipment:draw()
     end
 
     function player:craftItem(recipe)
-        if not self.inventory:hasItems(recipe.ingredients) then
+        if not self.inventory:hasItemsFromRecipe(recipe.ingredients) then
             return false
         end
-        if not self.inventory:hasFreeSlots(recipe.rewards) then
+        if not self.inventory:hasFreeSlots(#recipe.rewards) then
             return false
         end
 
-        self.inventory:deleteItems(recipe.ingredients)
-        self.inventory:addItems(recipe.results)
+        self.inventory:deleteItemsByRecipe(recipe.ingredients)
+        self.inventory:addItems(recipe.rewards)
 
         return true
     end

@@ -27,6 +27,10 @@ function game.keypressed(key)
     player:handleKeyPressed(key)
 end
 
+function game.mousepressed(x, y, button)
+    player:handleMousepressed(x, y, button)
+end
+
 function game.update(dt)
     player:update(dt)
 end

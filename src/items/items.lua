@@ -2,6 +2,8 @@ local nature = require("src.objects.nature")
 local util = require("src.util.util")
 local c = require("src.core.constants")
 
+local itemsSpriteSheet = love.graphics.newImage("assets/images/items/otsp_equipment_01.png")
+
 local items = {
     branch = {
         id = "branch",
@@ -22,7 +24,9 @@ local items = {
     axe = {
         id = "axe",
         name = "Axe",
-        stackable = false
+        stackable = false,
+        spritesheet = itemsSpriteSheet,
+        sptsQuad = util.makeQuad(itemsSpriteSheet,14, 16,c.TILE_SIZE,c.TILE_SIZE)
     }
 }
 
