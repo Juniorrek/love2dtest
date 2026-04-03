@@ -111,6 +111,13 @@ function Inventory.new(maxSize)
                         x,
                         y
                     )
+                elseif self.slots[i].id == items.branch.id then
+                    love.graphics.draw(
+                        items.branch.spritesheet,
+                        items.branch.sptsQuad,
+                        x,
+                        y
+                    )
                 end
             end
         end

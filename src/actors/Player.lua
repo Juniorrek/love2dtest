@@ -30,27 +30,27 @@ local ANIMATION_DIRECTION_COLUMNS = {
 local function buildAnimations(spritesheet)
     return {
         idle = {
-            up = { util.makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.UP, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) },
-            right = { util.makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.RIGHT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) },
-            down = { util.makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.DOWN, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) },
-            left = { util.makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.LEFT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) }
+            up = { util.makeQuadWithBorder(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.UP, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) },
+            right = { util.makeQuadWithBorder(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.RIGHT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) },
+            down = { util.makeQuadWithBorder(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.DOWN, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) },
+            left = { util.makeQuadWithBorder(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.LEFT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) }
         },
         walk = {
             up = {
-                util.makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.UP, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
-                util.makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.UP, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
+                util.makeQuadWithBorder(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.UP, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
+                util.makeQuadWithBorder(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.UP, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
             },
             right = {
-                util.makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.RIGHT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
-                util.makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.RIGHT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
+                util.makeQuadWithBorder(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.RIGHT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
+                util.makeQuadWithBorder(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.RIGHT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
             },
             down = {
-                util.makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.DOWN, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
-                util.makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.DOWN, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
+                util.makeQuadWithBorder(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.DOWN, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
+                util.makeQuadWithBorder(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.DOWN, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
             },
             left = {
-                util.makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.LEFT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
-                util.makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.LEFT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
+                util.makeQuadWithBorder(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.LEFT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
+                util.makeQuadWithBorder(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.LEFT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
             }
         }
     }
@@ -78,8 +78,6 @@ function Player.new()
         animationTimer = 0,
         animationSpeed = 0.2,
         animationsQuads = buildAnimations(spritesheet),
-        branches = 0,
-        stones = 0,
         inventory = Inventory.new(5)
     }
 
@@ -191,11 +189,14 @@ function Player.new()
                     map.removeTreeAt(lookingAt.x, lookingAt.y)
                 elseif map.hasTileAt(nature.tiles.BRANCH, lookingAt.x, lookingAt.y) then
                     map.removeTileAt(lookingAt.x, lookingAt.y)
-                    player.branches = player.branches + 1
+
+                    self.inventory:addItem({
+                        id = items.branch.id,
+                        qnt = 1
+                    })
                 elseif map.hasAt(nature.tiles.STONE, lookingAt.x, lookingAt.y) then
                     if self.inventory:hasFreeSlots(1) then
                         map.removeAt(nature.tiles.STONE, lookingAt.x, lookingAt.y)
-                        player.stones = player.stones + 1
 
                         self.inventory:addItem({
                             id = items.stone.id,
@@ -214,8 +215,6 @@ function Player.new()
             (self.position.x-1) * constants.TILE_SIZE,
             (self.position.y-1) * constants.TILE_SIZE
         )
-
-        love.graphics.print("Branches: " .. player.branches .. " | Stones: " .. player.stones)
 
         self.inventory:draw()
     end

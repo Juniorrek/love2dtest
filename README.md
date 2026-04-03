@@ -7,7 +7,6 @@ The main inspiration is:
 - Tibia for graphics and map feeling
 
 ## TODO
-- Finish grab stone slot inventory
 - Craft axe (branch and stone)
 - Be able to chop tree & get wood
 - Get fiber
