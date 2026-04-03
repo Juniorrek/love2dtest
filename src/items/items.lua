@@ -1,3 +1,5 @@
+local nature = require("src.objects.nature")
+
 local items = {
     branch = {
         id = "branch",
@@ -9,7 +11,9 @@ local items = {
         id = "stone",
         name = "Stone",
         stackable = true,
-        maxStack = 8
+        maxStack = 8,
+        spritesheet = nature.spriteSheet,
+        sptsQuad = nature.stoneQuad
     },
     axe = {
         id = "axe",

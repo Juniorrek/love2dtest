@@ -4,6 +4,8 @@ local map = require("src.world.map")
 local nature = require("src.objects.nature")
 local Recipes = require("src.items.recipes")
 local Inventory = require("src.actors.Inventory")
+local items = require("src.items.items")
+local util = require("src.util.util")
 
 -- MODULE
 local Player = {}
@@ -24,40 +26,31 @@ local ANIMATION_DIRECTION_COLUMNS = {
 }
 
 -- HELPERS
-local function makeQuad(spritesheet, row, column)
-    return love.graphics.newQuad(
-        1 + (column - 1) * ANIMATION_FRAME_WIDTH + (column - 1) * 1,
-        1 + (row - 1) * ANIMATION_FRAME_HEIGHT + (row - 1) * 1,
-        ANIMATION_FRAME_WIDTH,
-        ANIMATION_FRAME_HEIGHT,
-        spritesheet:getDimensions()
-    )
-end
 
 local function buildAnimations(spritesheet)
     return {
         idle = {
-            up = { makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.UP) },
-            right = { makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.RIGHT) },
-            down = { makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.DOWN) },
-            left = { makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.LEFT) }
+            up = { util.makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.UP, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) },
+            right = { util.makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.RIGHT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) },
+            down = { util.makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.DOWN, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) },
+            left = { util.makeQuad(spritesheet, ROW_IDLE, ANIMATION_DIRECTION_COLUMNS.LEFT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT) }
         },
         walk = {
             up = {
-                makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.UP),
-                makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.UP)
+                util.makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.UP, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
+                util.makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.UP, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
             },
             right = {
-                makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.RIGHT),
-                makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.RIGHT)
+                util.makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.RIGHT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
+                util.makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.RIGHT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
             },
             down = {
-                makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.DOWN),
-                makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.DOWN)
+                util.makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.DOWN, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
+                util.makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.DOWN, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
             },
             left = {
-                makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.LEFT),
-                makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.LEFT)
+                util.makeQuad(spritesheet, ROW_WALK_1, ANIMATION_DIRECTION_COLUMNS.LEFT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT),
+                util.makeQuad(spritesheet, ROW_WALK_2, ANIMATION_DIRECTION_COLUMNS.LEFT, ANIMATION_FRAME_WIDTH, ANIMATION_FRAME_HEIGHT)
             }
         }
     }
@@ -200,11 +193,14 @@ function Player.new()
                     map.removeTileAt(lookingAt.x, lookingAt.y)
                     player.branches = player.branches + 1
                 elseif map.hasAt(nature.tiles.STONE, lookingAt.x, lookingAt.y) then
-                    if not self.inventory:hasFreeSlots(#recipe.rewards) then
+                    if self.inventory:hasFreeSlots(1) then
                         map.removeAt(nature.tiles.STONE, lookingAt.x, lookingAt.y)
                         player.stones = player.stones + 1
 
-                            return false
+                        self.inventory:addItem({
+                            id = items.stone.id,
+                            qnt = 1
+                        })
                     end
                 end
             end
@@ -220,6 +216,8 @@ function Player.new()
         )
 
         love.graphics.print("Branches: " .. player.branches .. " | Stones: " .. player.stones)
+
+        self.inventory:draw()
     end
 
     function player:craftItem(recipe)

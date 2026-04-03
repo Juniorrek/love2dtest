@@ -59,20 +59,21 @@ function Inventory.new(maxSize)
         end
     end
 
-    function inventory:hasFreeSlots(rewards)
-        local slotsNeeded = 0
+    function inventory:hasFreeSlots(qnt)
+        --[[ local slotsNeeded = 0
         for k, rew in pairs(rewards) do
             if not items[rew.id].stackable then
                 slotsNeeded = slotsNeeded + 1
             else
+                -- TODO improve latter treat each reward as one, catching stacking, if someone can't be picked it doesn't pick and get in the ground
                 slotsNeeded = slotsNeeded + 
                     items[rew.id].maxSize --TODO check where can stack or need a slot
             end
-        end
+        end ]]
 
 
         local slotAvailable = self.max - #self.slots
-        if slotAvailable > qnt then return true
+        if slotAvailable >= qnt then return true
         else return false end
     end
 
@@ -82,12 +83,39 @@ function Inventory.new(maxSize)
         return nextSlot
     end
 
+    function inventory:addItem(item)
+        local nextSlot = self:nextSlotAvailable()
+        self.slots[nextSlot] = item
+    end
+
     function inventory:addItems(rewards)
         for k, rew in pairs(rewards) do
             local nextSlot = self:nextSlotAvailable()
             self.inventory[nextSlot] = rew
         end
     end
+
+    function inventory:draw()
+        for i = 1, self.max do
+            local x = (love.graphics.getWidth() - (self.max*32))/2 -- center
+                    + (32*i) --per slot offset
+            local y = love.graphics.getHeight() - 50
+
+            love.graphics.rectangle("line", x, y, 32, 32)
+
+            if self.slots[i] then
+                if self.slots[i].id == items.stone.id then
+                    love.graphics.draw(
+                        items.stone.spritesheet,
+                        items.stone.sptsQuad,
+                        x,
+                        y
+                    )
+                end
+            end
+        end
+    end
+
 
     return inventory
 end

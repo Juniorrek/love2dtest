@@ -3,6 +3,7 @@ local constants = require("src.core.constants")
 local nature = {}
 
 nature.spriteSheet = love.graphics.newImage("assets/other/otsp_nature_01.png")
+--TODO usar util
 nature.stoneQuad = love.graphics.newQuad(
     7 * constants.TILE_SIZE,
     39 * constants.TILE_SIZE,

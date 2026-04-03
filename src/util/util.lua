@@ -1,0 +1,13 @@
+local util = {}
+
+function util.makeQuad(spritesheet, row, column, width, height)
+    return love.graphics.newQuad(
+        1 + (column - 1) * width + (column - 1) * 1,
+        1 + (row - 1) * height + (row - 1) * 1,
+        width,
+        height,
+        spritesheet:getDimensions()
+    )
+end
+
+return util
