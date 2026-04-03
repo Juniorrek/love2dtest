@@ -2,6 +2,8 @@
 local constants = require("src.core.constants")
 local map = require("src.world.map")
 local nature = require("src.objects.nature")
+local Recipes = require("src.items.recipes")
+local Inventory = require("src.actors.Inventory")
 
 -- MODULE
 local Player = {}
@@ -84,7 +86,8 @@ function Player.new()
         animationSpeed = 0.2,
         animationsQuads = buildAnimations(spritesheet),
         branches = 0,
-        stones = 0
+        stones = 0,
+        inventory = Inventory.new(5)
     }
 
     -- METHODS
@@ -179,7 +182,15 @@ function Player.new()
     end
 
     function player:handleKeyPressed(key)
-        if key == "space" then
+        if key == "c" then
+            local success = self:craftItem(Recipes.axe)
+
+            if success then
+                print("axe crafted")
+            else
+                print("no items")
+            end
+        elseif key == "space" then
             if not self.moving then
                 --TODO looking at return the upper object ID
                 local lookingAt = self:lookingAt()
@@ -189,8 +200,12 @@ function Player.new()
                     map.removeTileAt(lookingAt.x, lookingAt.y)
                     player.branches = player.branches + 1
                 elseif map.hasAt(nature.tiles.STONE, lookingAt.x, lookingAt.y) then
-                    map.removeAt(nature.tiles.STONE, lookingAt.x, lookingAt.y)
-                    player.stones = player.stones + 1
+                    if not self.inventory:hasFreeSlots(#recipe.rewards) then
+                        map.removeAt(nature.tiles.STONE, lookingAt.x, lookingAt.y)
+                        player.stones = player.stones + 1
+
+                            return false
+                    end
                 end
             end
         end
@@ -206,6 +221,21 @@ function Player.new()
 
         love.graphics.print("Branches: " .. player.branches .. " | Stones: " .. player.stones)
     end
+
+    function player:craftItem(recipe)
+        if not self.inventory:hasItems(recipe.ingredients) then
+            return false
+        end
+        if not self.inventory:hasFreeSlots(recipe.rewards) then
+            return false
+        end
+
+        self.inventory:deleteItems(recipe.ingredients)
+        self.inventory:addItems(recipe.results)
+
+        return true
+    end
+
 
     return player
 end
