@@ -84,10 +84,11 @@ function Player.new()
     }
 
     -- METHODS
-    function player:equipItem()
-        --if self.inventory and self.inventory.slots[slot].id == items.axe.id then
-            print("clicou machado")
-        --end
+    function player:equipItem(slotClicked)
+        if self.equipment:canEquip(self.inventory.slots[slotClicked].id) then
+            self.equipment:equip(self.inventory.slots[slotClicked])
+            self.inventory:deleteItemFromSlot(slotClicked)
+        end
     end
 
 
@@ -221,10 +222,7 @@ function Player.new()
 
     function player:handleMousepressed(x, y, button)
         self.inventory:handleMousepressed(x, y, button, function(slotClicked)
-            if self.equipment:canEquip(self.inventory.slots[slotClicked].id) then
-                self.equipment:equip(self.inventory.slots[slotClicked])
-                self.inventory:deleteItemFromSlot(slotClicked)
-            end
+            self:equipItem(slotClicked)
         end)
     end
 
