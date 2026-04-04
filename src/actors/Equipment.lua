@@ -1,5 +1,6 @@
 local util = require("src.util.util")
 local c = require("src.core.constants")
+local items = require("src.items.items")
 
 local Equipment = {}
 
@@ -8,6 +9,27 @@ local equipDefaultSpts = love.graphics.newImage("assets/images/items/equipments_
 function Equipment.new()
     local equipment = {}
     local oy = 10
+
+    function equipment:canEquip(itemId)
+        if itemId == items.axe.id then
+            if self.rhand == nil then
+                return true
+            elseif self.lhand == nil then
+                return true
+            end
+            return false
+        end
+    end
+
+    function equipment:equip(item)
+        if item.id == items.axe.id then
+            if self.rhand == nil then
+                self.rhand = item
+            elseif self.lhand == nil then
+                self.lhand = item
+            end
+        end
+    end
 
     function equipment.drawSlots()
         --AMULET/HEAD/BACKPACK
@@ -26,9 +48,9 @@ function Equipment.new()
         love.graphics.rectangle("line", love.graphics.getWidth() - 82,  (love.graphics.getHeight()/3)-16-oy+96, 32, 32)
     end
 
-    function equipment.drawEquipments()
+    function equipment:drawEquipments()
         --AMULET/HEAD/BACKPACK
-        if equipment.amulet == nil then
+        if self.amulet == nil then
             love.graphics.draw(
                         equipDefaultSpts,
                         util.makeQuad(equipDefaultSpts,1, 1,c.TILE_SIZE,c.TILE_SIZE),
@@ -38,7 +60,7 @@ function Equipment.new()
         else 
 
         end
-        if equipment.head == nil then
+        if self.head == nil then
             love.graphics.draw(
                         equipDefaultSpts,
                         util.makeQuad(equipDefaultSpts,1, 2,c.TILE_SIZE,c.TILE_SIZE),
@@ -48,7 +70,7 @@ function Equipment.new()
         else
 
         end
-        if equipment.backpack == nil then
+        if self.backpack == nil then
             love.graphics.draw(
                         equipDefaultSpts,
                         util.makeQuad(equipDefaultSpts,1, 3,c.TILE_SIZE,c.TILE_SIZE),
@@ -59,7 +81,7 @@ function Equipment.new()
             
         end
         --RHAND/TORSO/LHAND
-        if equipment.rhand == nil then
+        if self.rhand == nil then
             love.graphics.draw(
                         equipDefaultSpts,
                         util.makeQuad(equipDefaultSpts,2, 1,c.TILE_SIZE,c.TILE_SIZE),
@@ -67,9 +89,14 @@ function Equipment.new()
                         (love.graphics.getHeight()/3)-16+32
                     )
         else 
-
+            love.graphics.draw(
+                        items[self.rhand.id].spritesheet,
+                        items[self.rhand.id].sptsQuad,
+                        love.graphics.getWidth() - 114,
+                        (love.graphics.getHeight()/3)-16+32
+                    )
         end
-        if equipment.torso == nil then
+        if self.torso == nil then
             love.graphics.draw(
                         equipDefaultSpts,
                         util.makeQuad(equipDefaultSpts,2, 2,c.TILE_SIZE,c.TILE_SIZE),
@@ -79,7 +106,7 @@ function Equipment.new()
         else
 
         end
-        if equipment.lhand == nil then
+        if self.lhand == nil then
             love.graphics.draw(
                         equipDefaultSpts,
                         util.makeQuad(equipDefaultSpts,2, 3,c.TILE_SIZE,c.TILE_SIZE),
@@ -87,10 +114,15 @@ function Equipment.new()
                         (love.graphics.getHeight()/3)-16+32
                     )
         else
-            
+            love.graphics.draw(
+                        items[self.lhand.id].spritesheet,
+                        items[self.lhand.id].sptsQuad,
+                        love.graphics.getWidth() - 114,
+                        (love.graphics.getHeight()/3)-16+32
+                    )
         end
         --RRING/LEGS/LRING
-        if equipment.rring == nil then
+        if self.rring == nil then
             love.graphics.draw(
                         equipDefaultSpts,
                         util.makeQuad(equipDefaultSpts,3, 1,c.TILE_SIZE,c.TILE_SIZE),
@@ -100,7 +132,7 @@ function Equipment.new()
         else 
 
         end
-        if equipment.legs == nil then
+        if self.legs == nil then
             love.graphics.draw(
                         equipDefaultSpts,
                         util.makeQuad(equipDefaultSpts,3, 2,c.TILE_SIZE,c.TILE_SIZE),
@@ -110,7 +142,7 @@ function Equipment.new()
         else
 
         end
-        if equipment.zzzzz == nil then
+        if self.zzzzz == nil then
             love.graphics.draw(
                         equipDefaultSpts,
                         util.makeQuad(equipDefaultSpts,3, 3,c.TILE_SIZE,c.TILE_SIZE),
@@ -121,7 +153,7 @@ function Equipment.new()
             
         end
         --BOOTS
-        if equipment.boots == nil then
+        if self.boots == nil then
             love.graphics.draw(
                         equipDefaultSpts,
                         util.makeQuad(equipDefaultSpts,4, 2,c.TILE_SIZE,c.TILE_SIZE),

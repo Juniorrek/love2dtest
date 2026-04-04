@@ -2,9 +2,14 @@ local items = require("src.items.items")
 
 local Inventory = {}
 
-function Inventory.new(maxSize, equipItem)
+function Inventory.new(maxSize)
     local inventory = {
-        slots = {},
+        slots = {
+            {
+                id = items.axe.id,
+                qnt = 1
+            }
+        },
         max = maxSize
     }
 
@@ -39,6 +44,10 @@ function Inventory.new(maxSize, equipItem)
     end
 
     function inventory:deleteItem()
+    end
+
+    function inventory:deleteItemFromSlot(slot)
+        self.slots[slot] = nil
     end
 
     function inventory:deleteItemsByRecipe(ingredients)
@@ -99,7 +108,7 @@ function Inventory.new(maxSize, equipItem)
         end
     end
 
-    function inventory:handleMousepressed(x, y, button)
+    function inventory:handleMousepressed(x, y, button, callback)
         --TODO +32 ESQUISITO
         if x > X_INV+32 and x < X_INV + inventory.max*32+32 and y > Y_INV and y < Y_INV + 32 then
             local diff = x-(X_INV+32)
@@ -107,7 +116,7 @@ function Inventory.new(maxSize, equipItem)
             
             if self.slots[slotClicked] ~= nil then
                 if self.slots[slotClicked].id == items.axe.id then-- TODO REMOVE PLAYER  FAZ
-                    equipItem(slotClicked)
+                    callback(slotClicked)
                 end
             end
         end

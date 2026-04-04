@@ -79,17 +79,17 @@ function Player.new()
         animationTimer = 0,
         animationSpeed = 0.2,
         animationsQuads = buildAnimations(spritesheet),
+        inventory = Inventory.new(5),
         equipment = Equipment.new()
     }
 
     -- METHODS
-    function player:equipItem(slot)
-        --[[ if self.inventory.slots[slot].id == items.axe.id then
+    function player:equipItem()
+        --if self.inventory and self.inventory.slots[slot].id == items.axe.id then
             print("clicou machado")
-        end ]]
+        --end
     end
 
-    player.inventory = Inventory.new(5, player:equipItem())
 
     function player:getCurrentQuad()
         local state = self.moving and "walk" or "idle"
@@ -220,7 +220,12 @@ function Player.new()
     end
 
     function player:handleMousepressed(x, y, button)
-        self.inventory:handleMousepressed(x, y, button)
+        self.inventory:handleMousepressed(x, y, button, function(slotClicked)
+            if self.equipment:canEquip(self.inventory.slots[slotClicked].id) then
+                self.equipment:equip(self.inventory.slots[slotClicked])
+                self.inventory:deleteItemFromSlot(slotClicked)
+            end
+        end)
     end
 
     function player:draw()
