@@ -224,6 +224,10 @@ function Player.new()
         self.inventory:handleMousepressed(x, y, button, function(slotClicked)
             self:equipItem(slotClicked)
         end)
+
+        self.equipment:handleMousepressed(x, y, button, function()
+            print("a")
+        end)
     end
 
     function player:draw()

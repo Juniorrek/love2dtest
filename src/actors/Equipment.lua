@@ -31,6 +31,21 @@ function Equipment.new()
         end
     end
 
+    function equipment:handleMousepressed(x, y, button, callback)
+        -- TODO unequip
+
+        --[[ if x > X_INV+32 and x < X_INV + inventory.max*32+32 and y > Y_INV and y < Y_INV + 32 then
+            local diff = x-(X_INV+32)
+            local slotClicked = (math.floor((diff+32)/32))
+            
+            if self.slots[slotClicked] ~= nil then
+                if self.slots[slotClicked].id == items.axe.id then-- TODO REMOVE PLAYER  FAZ
+                    callback(slotClicked)
+                end
+            end
+        end ]]
+    end
+
     function equipment.drawSlots()
         --AMULET/HEAD/BACKPACK
         love.graphics.rectangle("line", love.graphics.getWidth() - 50,  (love.graphics.getHeight()/3)-16, 32, 32)
