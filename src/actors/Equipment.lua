@@ -9,6 +9,10 @@ local equipDefaultSpts = love.graphics.newImage("assets/images/items/equipments_
 function Equipment.new()
     local equipment = {}
     local oy = 10
+    local aliases = {
+        rhand = "rhand",
+        lhand = "lhand"
+    }
 
     function equipment:canEquip(itemId)
         if itemId == items.axe.id then
@@ -44,6 +48,14 @@ function Equipment.new()
                 end
             end
         end ]]
+    end
+
+    function equipment:isEquiped(itemId)
+        if items[itemId].type == "weapon" then
+            return self[aliases.rhand] ~= nil or self[aliases.lhand] ~= nil 
+        end
+
+        return false
     end
 
     function equipment.drawSlots()
@@ -132,7 +144,7 @@ function Equipment.new()
             love.graphics.draw(
                         items[self.lhand.id].spritesheet,
                         items[self.lhand.id].sptsQuad,
-                        love.graphics.getWidth() - 114,
+                        love.graphics.getWidth() - 50,
                         (love.graphics.getHeight()/3)-16+32
                     )
         end

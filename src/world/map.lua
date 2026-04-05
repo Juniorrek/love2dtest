@@ -1,26 +1,35 @@
 local nature = require("src.objects.nature")
 local constants = require("src.core.constants")
+local items = require("src.items.items")
 
 local sti = require("libraries.sti")
 
 local map = {}
 
-function map.load()
-    map.tilemap = sti("assets/map.lua")
-
-    map.stones = {}
+function map.loadObjectsFromTiles()
     for y,v in ipairs(map.tilemap.layers["Nature.Objects"].data) do
         for x, tile in pairs(v) do
             if tile ~= nil then
                 if tile.id == nature.tiles.STONE then
-                    table.insert(map.stones, {
-                        x = x,
-                        y = y
-                    })
+                    if map.objects[y] == nil then
+                        map.objects[y] = {}
+                    end
+
+                    map.objects[y][x] = {
+                        id = items.stone.id,
+                        qnt = 1
+                    }
                 end
             end
         end
     end
+end
+
+function map.load()
+    map.tilemap = sti("assets/map.lua")
+
+    map.objects = {}
+    map.loadObjectsFromTiles()
 
     nature.generateStones(map)
 end
@@ -31,13 +40,9 @@ function map.movableTile(x, y)
     return map.tilemap.layers["Collision"].data[y][x] == nil
 end
 
-function map.hasAt(tileId, x, y)
-    if tileId == nature.tiles.STONE then
-        for k, v in ipairs(map.stones) do
-            if x == v.x and y == v.y then
-                return true
-            end
-        end
+function map.hasObjAt(objId, x, y)
+    if objId == items.stone.id then
+        return  map.objects[y] ~= nil and map.objects[y][x] ~= nil and map.objects[y][x].id == items.stone.id
     end
 
     return false
@@ -48,13 +53,6 @@ function map.hasTileAt(tileId, x, y)
         return false
     end
     return map.tilemap.layers["Nature.Nature"].data[y][x].id == tileId
-end
-
-function map.hasTreeAt(x, y)
-    if map.tilemap.layers["Nature.Nature"].data[y][x] == nil then
-        return false
-    end
-    return map.tilemap.layers["Nature.Nature"].data[y][x].id == nature.tiles.TREE
 end
 
 function map.removeTreeAt(x, y)
@@ -73,24 +71,37 @@ function map.removeTileAt(x, y)
     map.tilemap:setLayerTile("Nature.Nature", x, y, 0)
 end
 
-function map.removeAt(tileId, x, y)
-    if tileId == nature.tiles.STONE then
-        for k, v in ipairs(map.stones) do
-            if x == v.x and y == v.y then
-                table.remove(map.stones, k)
-            end
-        end
-    end
+function map.removeObjectAt(x, y)
+    map.objects[y][x] = nil
 end
 
-function map.drawStones(self)
-    for i, v in ipairs(self.stones) do
-        love.graphics.draw(
-            nature.spriteSheet,
-            nature.stoneQuad,
-            (v.x - 1) * constants.TILE_SIZE,
-            (v.y - 1) * constants.TILE_SIZE
-        )
+
+
+function map.interact(x, y)
+    local type = ""
+    if map.hasObjAt(items.stone.id, x, y) then
+        type = "stone"
+    elseif map.hasTileAt(nature.tiles.BRANCH, x, y) then
+        type = "branch"
+    elseif map.hasTileAt(nature.tiles.TREE, x, y) then
+        type = "tree"
+    end
+
+    return type
+end
+
+function map.drawObjects()
+    for y,v in pairs(map.objects) do
+        for x, obj in pairs(v) do
+            if obj ~= nil then
+                love.graphics.draw(
+                    items[obj.id].spritesheet,
+                    items[obj.id].sptsQuad,
+                    (x - 1) * constants.TILE_SIZE,
+                    (y - 1) * constants.TILE_SIZE
+                )
+            end
+        end
     end
 end
 
@@ -98,7 +109,7 @@ function map.drawGround()
     map.tilemap:drawTileLayer("Ground")
     map.tilemap:drawTileLayer("Nature.Nature")
 
-    map:drawStones()
+    map.drawObjects()
 end
 
 function map.drawAbove()

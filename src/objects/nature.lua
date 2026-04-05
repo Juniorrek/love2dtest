@@ -1,16 +1,8 @@
 local constants = require("src.core.constants")
+local s = require("src.util.sprites")
+local items = require("src.items.items")
 
 local nature = {}
-
-nature.spriteSheet = love.graphics.newImage("assets/other/otsp_nature_01.png")
---TODO usar util
-nature.stoneQuad = love.graphics.newQuad(
-    7 * constants.TILE_SIZE,
-    39 * constants.TILE_SIZE,
-    constants.TILE_SIZE,
-    constants.TILE_SIZE,
-    nature.spriteSheet:getDimensions()
-)
 
 nature.tiles = {
     TREE = 22,
@@ -20,23 +12,38 @@ nature.tiles = {
 }
 
 function nature.generateStones(map)
+    local stonesOnMap = 0
+    for y, row in pairs(map.objects) do
+        for x, col in pairs(row) do
+            if map.objects[y][x].id == items.stone.id then
+                stonesOnMap = stonesOnMap + 1
+            end
+        end
+    end
+
     local maxStones = 10
-    local stonesToGenerate = 10 - #map.stones
+    local stonesToGenerate = maxStones - stonesOnMap
+
     for i = 1, stonesToGenerate do
         local stoneGenerated = false
         repeat
             -- TODO give preference to stone tiles
-            local randomX = love.math.random(11) + 1
-            local randomY = love.math.random(11) + 1
-            if map.tilemap.layers["Nature.Nature"].data[randomY][randomX] == nil then
-                table.insert(map.stones, {
-                    x = randomX,
-                    y = randomY
-                })
+            local rX = love.math.random(11) + 1
+            local rY = love.math.random(11) + 1
+
+            local natureEmpty = map.tilemap.layers["Nature.Nature"].data[rY][rX] == nil
+            if (map.objects[rY] == nil or map.objects[rY][rX] == nil) and natureEmpty then
+                if map.objects[rY] == nil then
+                    map.objects[rY] = {}
+                end
+                map.objects[rY][rX] = {
+                    id = items.stone.id,
+                    qnt = 1
+                }
                 stoneGenerated = true
             end
         until stoneGenerated
     end
 end
 
-return nature;
+return nature

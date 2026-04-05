@@ -7,7 +7,6 @@ The main inspiration is:
 - Tibia for graphics and map feeling
 
 ## TODO
-- Craft axe (branch and stone)
 - Be able to chop tree & get wood
 - Get fiber
 - Craft bonfire (wood and fiber)

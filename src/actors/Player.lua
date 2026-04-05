@@ -182,40 +182,43 @@ function Player.new()
         end
     end
 
-    function player:handleKeyPressed(key)
+    function player:interact(x, y)
+        local type = map.interact(x, y)
+
+        if type == "stone" then
+            if self.inventory:hasFreeSlots(1) then
+                map.removeObjectAt(x, y)
+
+                self.inventory:addItem({
+                    id = items.stone.id,
+                    qnt = 1
+                })
+            end
+        elseif type == "branch" then
+            if self.inventory:hasFreeSlots(1) then
+                map.removeTileAt(x, y)
+
+                self.inventory:addItem({
+                    id = items.branch.id,
+                    qnt = 1
+                })
+            end
+        elseif type == "tree" then
+            if self.equipment:isEquiped(items.axe.id) then
+                map.removeTreeAt(x, y)
+            end
+        end
+    end
+
+    function player:handleKeyPressed(key, callback)
         if key == "c" then
             local success = self:craftItem(Recipes.axe)
-
-            if success then
-                print("axe crafted")
-            else
-                print("no items")
-            end
         elseif key == "space" then
             if not self.moving then
                 --TODO looking at return the upper object ID
                 local lookingAt = self:lookingAt()
-                if map.hasTreeAt(lookingAt.x, lookingAt.y) then
-                    map.removeTreeAt(lookingAt.x, lookingAt.y)
-                elseif map.hasTileAt(nature.tiles.BRANCH, lookingAt.x, lookingAt.y) then
-                    if self.inventory:hasFreeSlots(1) then
-                        map.removeTileAt(lookingAt.x, lookingAt.y)
 
-                        self.inventory:addItem({
-                            id = items.branch.id,
-                            qnt = 1
-                        })
-                    end
-                elseif map.hasAt(nature.tiles.STONE, lookingAt.x, lookingAt.y) then
-                    if self.inventory:hasFreeSlots(1) then
-                        map.removeAt(nature.tiles.STONE, lookingAt.x, lookingAt.y)
-
-                        self.inventory:addItem({
-                            id = items.stone.id,
-                            qnt = 1
-                        })
-                    end
-                end
+                self:interact(lookingAt.x, lookingAt.y)
             end
         end
     end
@@ -226,7 +229,7 @@ function Player.new()
         end)
 
         self.equipment:handleMousepressed(x, y, button, function()
-            print("a")
+            --print("a") --UNEQUIP 
         end)
     end
 
@@ -246,6 +249,7 @@ function Player.new()
         if not self.inventory:hasItemsFromRecipe(recipe.ingredients) then
             return false
         end
+        -- TODO consider the freed space from ingredients
         if not self.inventory:hasFreeSlots(#recipe.rewards) then
             return false
         end
