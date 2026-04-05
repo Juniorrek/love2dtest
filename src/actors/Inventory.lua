@@ -1,4 +1,5 @@
 local items = require("src.items.items")
+local util = require("src.util.util")
 
 local Inventory = {}
 
@@ -85,13 +86,13 @@ function Inventory.new(maxSize)
         end ]]
 
 
-        local slotAvailable = self.max - #self.slots
+        local slotAvailable = self.max - util.countElementsSparseTable(self.slots)
         if slotAvailable >= qnt then return true
         else return false end
     end
 
     function inventory:nextSlotAvailable()
-        local rest = self.max - #self.slots
+        local rest = self.max - util.countElementsSparseTable(self.slots)
         local nextSlot = self.max - rest + 1
         return nextSlot
     end
@@ -108,15 +109,33 @@ function Inventory.new(maxSize)
         end
     end
 
+    function inventory:clickedOnInventory(x, y)
+        --TODO +32 ESQUISITO
+        if x > X_INV+32 and x < X_INV + inventory.max*32+32 and y > Y_INV and y < Y_INV + 32 then
+            return true
+        end
+
+        return false
+    end
+
+    function inventory.getSlotAtMouse(x, y)
+        local diff = x-(X_INV+32)
+        local slotClicked = (math.floor((diff+32)/32))
+
+        return slotClicked
+    end
+
     function inventory:handleMousepressed(x, y, button, callback)
         --TODO +32 ESQUISITO
         if x > X_INV+32 and x < X_INV + inventory.max*32+32 and y > Y_INV and y < Y_INV + 32 then
-            local diff = x-(X_INV+32)
-            local slotClicked = (math.floor((diff+32)/32))
-            
-            if self.slots[slotClicked] ~= nil then
-                if self.slots[slotClicked].id == items.axe.id then-- TODO REMOVE PLAYER  FAZ
-                    callback(slotClicked)
+            if button == 1 then
+                local diff = x-(X_INV+32)
+                local slotClicked = (math.floor((diff+32)/32))
+                
+                if self.slots[slotClicked] ~= nil then
+                    if self.slots[slotClicked].id == items.axe.id then-- TODO REMOVE PLAYER  FAZ
+                        callback(slotClicked)
+                    end
                 end
             end
         end
@@ -129,28 +148,12 @@ function Inventory.new(maxSize)
             love.graphics.rectangle("line", X_INV_OFF, Y_INV, 32, 32)
 
             if self.slots[i] then
-                if self.slots[i].id == items.stone.id then
-                    love.graphics.draw(
-                        items.stone.spritesheet,
-                        items.stone.sptsQuad,
-                        X_INV_OFF,
-                        Y_INV
-                    )
-                elseif self.slots[i].id == items.branch.id then
-                    love.graphics.draw(
-                        items.branch.spritesheet,
-                        items.branch.sptsQuad,
-                        X_INV_OFF,
-                        Y_INV
-                    )
-                elseif self.slots[i].id == items.axe.id then
-                    love.graphics.draw(
-                        items.axe.spritesheet,
-                        items.axe.sptsQuad,
-                        X_INV_OFF,
-                        Y_INV
-                    )
-                end
+                love.graphics.draw(
+                    items[self.slots[i].id].spritesheet,
+                    items[self.slots[i].id].sptsQuad,
+                    X_INV_OFF,
+                    Y_INV
+                )
             end
         end
     end

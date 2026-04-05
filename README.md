@@ -30,6 +30,13 @@ The main inspiration is:
         player.stones = player.stones + 1
     end
     ```
+- Improve mouse core
+    - Own resposibilities map/player
+    ```
+    inventory:getItem(slot), inventory:moveItem(from,to),
+    map:getObjectAt(x,y), map:moveObject(from,to).
+    ```
+    - Drag with trashhold 5 pixels to start counting as drag
 
 ## References to check later
 

@@ -233,14 +233,14 @@ function Player.new()
         end
     end
 
-    function player:handleMousepressed(x, y, button)
-        self.inventory:handleMousepressed(x, y, button, function(slotClicked)
-            self:equipItem(slotClicked)
-        end)
-
+    function player:handleMousePressed(x, y, button)
         self.equipment:handleMousepressed(x, y, button, function()
             --print("a") --UNEQUIP 
         end)
+    end
+
+    function player:clickedOnInventory(x, y)
+        return self.inventory:clickedOnInventory(x, y)
     end
 
     function player:draw()

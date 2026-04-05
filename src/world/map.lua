@@ -40,18 +40,32 @@ function map.movableTile(x, y)
     return map.tilemap.layers["Collision"].data[y][x] == nil
 end
 
+function map.addObjAt(obj, x, y)
+    if map.objects[y] == nil then
+        map.objects[y] = {}
+    end
+    map.objects[y][x] = obj
+end
+
 function map.hasObjAt(objId, x, y)
-    if objId == items.stone.id then
-        return  map.objects[y] ~= nil and map.objects[y][x] ~= nil and map.objects[y][x].id == items.stone.id
+    if map.objects[y] == nil or map.objects[y][x] == nil then
+        return false
+    end
+    if objId == 0 then
+        return map.objects[y][x] ~= nil
     end
 
-    return false
+    return map.objects[y][x].id == items[objId].id
 end
 
 function map.hasTileAt(tileId, x, y)
     if map.tilemap.layers["Nature.Nature"].data[y][x] == nil then
         return false
     end
+    if tileId == 0 then
+        return map.tilemap.layers["Nature.Nature"].data[y][x] ~= nil
+    end
+
     return map.tilemap.layers["Nature.Nature"].data[y][x].id == tileId
 end
 
@@ -89,6 +103,20 @@ function map.interact(x, y)
 
     return type
 end
+
+ function map.getTileAtMouse(x, y)
+    local tileX = math.floor((x+32)/32)
+    local tileY = math.floor((y+32)/32)
+    return tileX, tileY
+end
+
+--[[ 
+    function inventory.getSlotAtMouse(x, y)
+        local diff = x-(X_INV+32)
+        local slotClicked = (math.floor((diff+32)/32))
+
+        return slotClicked
+    end ]]
 
 function map.drawObjects()
     for y,v in pairs(map.objects) do

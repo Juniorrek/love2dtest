@@ -1,6 +1,7 @@
 local Player = require("src.actors.Player")
 local map = require("src.world.map")
 local config = require("src.core.config")
+local mouse = require("src.core.mouse")
 
 local game = {}
 
@@ -31,7 +32,11 @@ function game.keypressed(key)
 end
 
 function game.mousepressed(x, y, button)
-    player:handleMousepressed(x, y, button)
+    player:handleMousePressed(x, y, button)
+    mouse.handleMousePressed(x, y, button, player)
+end
+function game.mousereleased(x, y, button)
+    mouse.handleMouseReleased(x, y, button, player)
 end
 
 function game.update(dt)
