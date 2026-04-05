@@ -7,6 +7,7 @@ local Inventory = require("src.actors.Inventory")
 local items = require("src.items.items")
 local util = require("src.util.util")
 local Equipment = require("src.actors.Equipment")
+local sfx = require("src.sound.sfx")
 
 -- MODULE
 local Player = {}
@@ -193,6 +194,8 @@ function Player.new()
                     id = items.stone.id,
                     qnt = 1
                 })
+
+                sfx:playItemSfx("interaction", items.stone.id)
             end
         elseif type == "branch" then
             if self.inventory:hasFreeSlots(1) then
@@ -202,10 +205,14 @@ function Player.new()
                     id = items.branch.id,
                     qnt = 1
                 })
+
+                sfx:playItemSfx("interaction", items.branch.id)
             end
         elseif type == "tree" then
             if self.equipment:isEquiped(items.axe.id) then
                 map.removeTreeAt(x, y)
+
+                --sfx:playItemSfx("interaction", items.axe.id)
             end
         end
     end
@@ -213,6 +220,9 @@ function Player.new()
     function player:handleKeyPressed(key, callback)
         if key == "c" then
             local success = self:craftItem(Recipes.axe)
+            if success then
+                sfx:playItemSfx("craft", items.axe.id)
+            end
         elseif key == "space" then
             if not self.moving then
                 --TODO looking at return the upper object ID

@@ -1,5 +1,6 @@
 local Player = require("src.actors.Player")
 local map = require("src.world.map")
+local config = require("src.core.config")
 
 local game = {}
 
@@ -10,7 +11,9 @@ function game.load()
     love.graphics.setBackgroundColor(0, 0.7, 1)
 
     local ambienceSound = love.audio.newSource("assets/audio/music/meadowAmbience.ogg", "stream")
-    --love.audio.play(ambienceSound)
+    if config.sound == "on" then
+        love.audio.play(ambienceSound)
+    end
 
     --TODO game informs map lua
     map.load()
