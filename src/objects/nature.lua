@@ -11,23 +11,23 @@ nature.tiles = {
     STONE = 631
 }
 
-function nature.generateStones(map)
-    local stonesOnMap = 0
+function nature.randomGeneration(map, itemId)
+    local itemsOnMap = 0
     for y, row in pairs(map.objects) do
         for x, col in pairs(row) do
-            if map.objects[y][x].id == items.stone.id then
-                stonesOnMap = stonesOnMap + 1
+            if map.objects[y][x].id == itemId then
+                itemsOnMap = itemsOnMap + 1
             end
         end
     end
 
-    local maxStones = 10
-    local stonesToGenerate = maxStones - stonesOnMap
+    local maxItems = 10
+    local itemsToGenerate = maxItems - itemsOnMap
 
-    for i = 1, stonesToGenerate do
-        local stoneGenerated = false
+    for i = 1, itemsToGenerate do
+        local itemGenerated = false
         repeat
-            -- TODO give preference to stone tiles
+            -- TODO give preference to specific tiles (stony grassy..)
             local rX = love.math.random(11) + 1
             local rY = love.math.random(11) + 1
 
@@ -37,12 +37,12 @@ function nature.generateStones(map)
                     map.objects[rY] = {}
                 end
                 map.objects[rY][rX] = {
-                    id = items.stone.id,
+                    id = itemId,
                     qnt = 1
                 }
-                stoneGenerated = true
+                itemGenerated = true
             end
-        until stoneGenerated
+        until itemGenerated
     end
 end
 

@@ -33,7 +33,6 @@ function game.keypressed(key)
 end
 
 function game.mousepressed(x, y, button)
-    player:handleMousePressed(x, y, button)
     mouse.handleMousePressed(x, y, button, player)
 end
 function game.mousereleased(x, y, button)

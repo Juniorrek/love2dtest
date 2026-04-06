@@ -10,9 +10,12 @@ function keyboard.handleKeyPressed(key, player)
         if success then
             sfx:playItemSfx("craft", items.axe.id)
         end
-        print(key)
+    elseif key == "f" then
+        local success = player:craftItem(Recipes.bonfire)
+        if success then
+            sfx:playItemSfx("craft", items.bonfire.id)
+        end
     elseif key == "space" then
-        print(key)
         if not player.moving then
             --TODO looking at return the upper object ID
             local lookingAt = player:lookingAt()

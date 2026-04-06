@@ -104,6 +104,10 @@ function Player.new()
             self.targetPosition.x = x
             self.targetPosition.y = y
             self.moving = true
+        else 
+            self.moving = false
+            self.animationFrame = 1
+            self.animationTimer = 0
         end
     end
 
@@ -200,16 +204,14 @@ function Player.new()
         elseif type == "tree" then
             if self.equipment:isEquiped(items.axe.id) then
                 map.removeTreeAt(x, y)
+                map.addObjAt({
+                    id = items.wood.id,
+                    qnt = 1
+                }, x, y)
 
                 --sfx:playItemSfx("interaction", items.axe.id)
             end
         end
-    end
-
-    function player:handleMousePressed(x, y, button)
-        self.equipment:handleMousepressed(x, y, button, function()
-            --print("a") --UNEQUIP 
-        end)
     end
 
     function player:clickedOnInventory(x, y)

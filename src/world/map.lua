@@ -31,7 +31,8 @@ function map.load()
     map.objects = {}
     map.loadObjectsFromTiles()
 
-    nature.generateStones(map)
+    nature.randomGeneration(map, items.stone.id)
+    nature.randomGeneration(map, items.fiber.id)
 end
 
 local chopTreeSfx = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
@@ -78,7 +79,7 @@ function map.removeTreeAt(x, y)
 
     map.tilemap:setLayerTile("Collision", x, y, 0)
 
-    love.audio.play(chopTreeSfx)
+    --love.audio.play(chopTreeSfx)
 end
 
 function map.removeTileAt(x, y)

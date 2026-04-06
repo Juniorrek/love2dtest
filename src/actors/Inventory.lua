@@ -18,15 +18,11 @@ function Inventory.new(maxSize)
             
     local Y_INV = love.graphics.getHeight() - 50
 
-    function inventory:hasItem(item)
-
-    end
-
     function inventory:countItem(itemId)
         local count = 0
         for k, v in pairs(self.slots) do
             if v.id == itemId then
-                count = count + 1
+                count = count + v.qnt
             end
         end
         return count
@@ -34,7 +30,6 @@ function Inventory.new(maxSize)
 
     function inventory:hasItemsFromRecipe(ingredients)
         for k, item in pairs(ingredients) do
-            
             local qntOwned = self:countItem(item.id)
             if qntOwned < item.qnt then
                 return false
@@ -42,9 +37,6 @@ function Inventory.new(maxSize)
         end
 
         return true
-    end
-
-    function inventory:deleteItem()
     end
 
     function inventory:deleteItemFromSlot(slot)
@@ -62,7 +54,7 @@ function Inventory.new(maxSize)
                     else
                         qntRemove = qntRemove - slot.qnt
                         slot.qnt = 0
-                        self.slots[j] = nil
+                        self:deleteItemFromSlot(j)
                     end
                 end
 
@@ -154,6 +146,10 @@ function Inventory.new(maxSize)
                     X_INV_OFF,
                     Y_INV
                 )
+            else
+                love.graphics.setColor(0, 0 , 1)
+                love.graphics.rectangle("line", X_INV_OFF, Y_INV, 32, 32)
+                love.graphics.setColor(1, 1 , 1)
             end
         end
     end

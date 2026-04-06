@@ -36,6 +36,38 @@ local items = {
             --interaction = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static"),
             craft = love.audio.newSource("assets/audio/sfx/vine_boom.mp3", "static")
         }
+    },
+    wood = {
+        id = "wood",
+        name = "Wood",
+        stackable = true,
+        maxStack = 4,
+        spritesheet = spts.nature,
+        sptsQuad = util.makeQuad(spts.nature,39, 7,c.TILE_SIZE,c.TILE_SIZE),
+        sound = {
+            --interaction = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
+        }
+    },
+    fiber = {
+        id = "fiber",
+        name = "Fiber",
+        stackable = true,
+        maxStack = 16,
+        spritesheet = spts.nature,
+        sptsQuad = util.makeQuad(spts.nature,10, 16,c.TILE_SIZE,c.TILE_SIZE),
+        sound = {
+            --interaction = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
+        }
+    },
+    bonfire = {
+        id = "bonfire",
+        name = "Bonfire",
+        stackable = false,
+        spritesheet = spts.misc,
+        sptsQuad = util.makeQuad(spts.misc,27, 1,c.TILE_SIZE,c.TILE_SIZE),
+        sound = {
+            --interaction = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
+        }
     }
 }
 
