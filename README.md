@@ -36,7 +36,21 @@ The main inspiration is:
     inventory:getItem(slot), inventory:moveItem(from,to),
     map:getObjectAt(x,y), map:moveObject(from,to).
     ```
+    - Include update state for functionalities like "item icon following the mouse"
     - Drag with trashhold 5 pixels to start counting as drag
+
+## Studies for later
+State machine
+-   normal, dragging, placing
+Controller pattern
+-   keyboard/mouse convert input into actions
+Single responsibility
+-   player is not also input manager and map editor
+Data-driven definitions
+-   items and harvestable objects described by tables
+World object abstraction
+-   dropped wood and bonfire can both live in a world-object system
+
 
 ## References to check later
 

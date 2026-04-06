@@ -2,6 +2,7 @@ local Player = require("src.actors.Player")
 local map = require("src.world.map")
 local config = require("src.core.config")
 local mouse = require("src.core.mouse")
+local keyboard = require("src.core.keyboard")
 
 local game = {}
 
@@ -28,7 +29,7 @@ function game.keypressed(key)
         love.event.quit()
     end
 
-    player:handleKeyPressed(key)
+    keyboard.handleKeyPressed(key, player)
 end
 
 function game.mousepressed(x, y, button)
@@ -40,6 +41,7 @@ function game.mousereleased(x, y, button)
 end
 
 function game.update(dt)
+    keyboard.update(player)
     player:update(dt)
 end
 

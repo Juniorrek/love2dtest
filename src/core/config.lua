@@ -1,6 +1,6 @@
 local config = {}
 
 config.sound = "off"
-config.sfx = "on"
+config.sfx = "off"
 
 return config

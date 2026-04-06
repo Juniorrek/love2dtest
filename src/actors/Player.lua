@@ -1,8 +1,6 @@
 -- MODULE DEPENDENCIES
 local constants = require("src.core.constants")
 local map = require("src.world.map")
-local nature = require("src.objects.nature")
-local Recipes = require("src.items.recipes")
 local Inventory = require("src.actors.Inventory")
 local items = require("src.items.items")
 local util = require("src.util.util")
@@ -75,6 +73,7 @@ function Player.new()
         },
         moving = false,
         direction = constants.DIRECTIONS.DOWN,
+        desiredDirection = nil,
         spritesheet = spritesheet,
         animationFrame = 1,
         animationTimer = 0,
@@ -108,34 +107,21 @@ function Player.new()
         end
     end
 
-    function player:handleInput()
-        if love.keyboard.isDown("lctrl") 
-            and (love.keyboard.isDown("up") or love.keyboard.isDown("w")) then
-            self.direction = constants.DIRECTIONS.UP
-        elseif love.keyboard.isDown("lctrl") 
-            and (love.keyboard.isDown("left") or love.keyboard.isDown("a")) then
-            self.direction = constants.DIRECTIONS.LEFT
-        elseif love.keyboard.isDown("lctrl") 
-            and (love.keyboard.isDown("down") or love.keyboard.isDown("s")) then
-            self.direction = constants.DIRECTIONS.DOWN
-        elseif love.keyboard.isDown("lctrl") 
-            and (love.keyboard.isDown("right") or love.keyboard.isDown("d")) then
-            self.direction = constants.DIRECTIONS.RIGHT
-        -------------------
-        elseif love.keyboard.isDown("up") or love.keyboard.isDown("w") then
+    function player:moveFromDesiredDirection()
+        if self.desiredDirection == constants.DIRECTIONS.UP then
             self:tryMove(self.position.x, self.position.y - 1, constants.DIRECTIONS.UP)
-        elseif love.keyboard.isDown("left") or love.keyboard.isDown("a") then
+        elseif self.desiredDirection == constants.DIRECTIONS.LEFT then
             self:tryMove(self.position.x - 1, self.position.y, constants.DIRECTIONS.LEFT)
-        elseif love.keyboard.isDown("down") or love.keyboard.isDown("s") then
+        elseif self.desiredDirection == constants.DIRECTIONS.DOWN then
             self:tryMove(self.position.x, self.position.y + 1, constants.DIRECTIONS.DOWN)
-        elseif love.keyboard.isDown("right") or love.keyboard.isDown("d") then
+        elseif self.desiredDirection == constants.DIRECTIONS.RIGHT then
             self:tryMove(self.position.x + 1, self.position.y, constants.DIRECTIONS.RIGHT)
         end
     end
 
     function player:update(dt)
-        if not self.moving then
-            self:handleInput()
+        if not self.moving and self.desiredDirection then
+            self:moveFromDesiredDirection()
         end
 
         if self.moving then
@@ -163,10 +149,13 @@ function Player.new()
             end
 
             if self.position.x == self.targetPosition.x and self.position.y == self.targetPosition.y then
-                self.moving = false
-                self.animationFrame = 1
-                self.animationTimer = 0
-                self:handleInput()
+                if not self.desiredDirection then
+                    self.moving = false
+                    self.animationFrame = 1
+                    self.animationTimer = 0
+                else
+                    self:moveFromDesiredDirection()
+                end
             end
         end
     end
@@ -213,22 +202,6 @@ function Player.new()
                 map.removeTreeAt(x, y)
 
                 --sfx:playItemSfx("interaction", items.axe.id)
-            end
-        end
-    end
-
-    function player:handleKeyPressed(key, callback)
-        if key == "c" then
-            local success = self:craftItem(Recipes.axe)
-            if success then
-                sfx:playItemSfx("craft", items.axe.id)
-            end
-        elseif key == "space" then
-            if not self.moving then
-                --TODO looking at return the upper object ID
-                local lookingAt = self:lookingAt()
-
-                self:interact(lookingAt.x, lookingAt.y)
             end
         end
     end
