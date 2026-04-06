@@ -67,7 +67,9 @@ local items = {
         sptsQuad = util.makeQuad(spts.misc,27, 1,c.TILE_SIZE,c.TILE_SIZE),
         sound = {
             --interaction = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
-        }
+        },
+        light = true,
+        lightRadius = 100
     }
 }
 

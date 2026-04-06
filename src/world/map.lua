@@ -1,6 +1,7 @@
 local nature = require("src.objects.nature")
 local constants = require("src.core.constants")
 local items = require("src.items.items")
+local light = require("src.world.light")
 
 local sti = require("libraries.sti")
 
@@ -111,23 +112,18 @@ end
     return tileX, tileY
 end
 
---[[ 
-    function inventory.getSlotAtMouse(x, y)
-        local diff = x-(X_INV+32)
-        local slotClicked = (math.floor((diff+32)/32))
-
-        return slotClicked
-    end ]]
-
 function map.drawObjects()
     for y,v in pairs(map.objects) do
         for x, obj in pairs(v) do
             if obj ~= nil then
+                local tileX = (x - 1) * constants.TILE_SIZE
+                local tileY = (y - 1) * constants.TILE_SIZE
+
                 love.graphics.draw(
                     items[obj.id].spritesheet,
                     items[obj.id].sptsQuad,
-                    (x - 1) * constants.TILE_SIZE,
-                    (y - 1) * constants.TILE_SIZE
+                    tileX,
+                    tileY
                 )
             end
         end
@@ -143,6 +139,7 @@ end
 
 function map.drawAbove()
     map.tilemap:drawTileLayer("Nature.Above Nature")
+    light.draw(map.objects)
 end
 
 return map

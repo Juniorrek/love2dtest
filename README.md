@@ -38,6 +38,7 @@ The main inspiration is:
     ```
     - Include update state for functionalities like "item icon following the mouse"
     - Drag with trashhold 5 pixels to start counting as drag
+- Improve light system with a dark overlay +  light spots...
 
 ## Studies for later
 State machine

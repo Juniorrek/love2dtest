@@ -9,6 +9,10 @@ function Inventory.new(maxSize)
             {
                 id = items.axe.id,
                 qnt = 1
+            },
+            {
+                id = items.bonfire.id,
+                qnt = 1
             }
         },
         max = maxSize
