@@ -1,11 +1,12 @@
 -- MODULE DEPENDENCIES
 local constants = require("src.core.constants")
 local map = require("src.world.map")
-local Inventory = require("src.actors.Inventory")
+local Inventory = require("src.entities.actors.Inventory")
 local items = require("src.items.items")
 local util = require("src.util.util")
-local Equipment = require("src.actors.Equipment")
+local Equipment = require("src.entities.actors.Equipment")
 local sfx = require("src.sound.sfx")
+local Entities = require("src.entities.entities")
 
 -- MODULE
 local Player = {}
@@ -63,13 +64,21 @@ function Player.new()
     -- TABLE INSTANCE
     local player = {
         position = {
-            x = 4,
-            y = 4
+            draw = {
+                x = 4,
+                y = 4
+            },
+            grid = {
+                x = 4,
+                y = 4
+            }
         },
         speed = 4,
         targetPosition = {
-            x = 4,
-            y = 4
+            grid = {
+                x = 4,
+                y = 4
+            }
         },
         moving = false,
         direction = constants.DIRECTIONS.DOWN,
@@ -100,11 +109,17 @@ function Player.new()
 
     function player:tryMove(x, y, direction)
         self.direction = direction
-        if map.movableTile(x, y) then
-            self.targetPosition.x = x
-            self.targetPosition.y = y
+        if map.movableTile(x, y) and not Entities.hasEntityAt(x, y) then
+            self.targetPosition.grid.x = x
+            self.targetPosition.grid.y = y
+            
+            Entities.moveEntity(self, self.targetPosition.grid.x, self.targetPosition.grid.y)
+
             self.moving = true
         else 
+            -- self.position.grid.x = self.targetPosition.grid.x
+            -- self.position.grid.y = self.targetPosition.grid.y
+
             self.moving = false
             self.animationFrame = 1
             self.animationTimer = 0
@@ -113,13 +128,13 @@ function Player.new()
 
     function player:moveFromDesiredDirection()
         if self.desiredDirection == constants.DIRECTIONS.UP then
-            self:tryMove(self.position.x, self.position.y - 1, constants.DIRECTIONS.UP)
+            self:tryMove(self.position.grid.x, self.position.grid.y - 1, constants.DIRECTIONS.UP)
         elseif self.desiredDirection == constants.DIRECTIONS.LEFT then
-            self:tryMove(self.position.x - 1, self.position.y, constants.DIRECTIONS.LEFT)
+            self:tryMove(self.position.grid.x - 1, self.position.grid.y, constants.DIRECTIONS.LEFT)
         elseif self.desiredDirection == constants.DIRECTIONS.DOWN then
-            self:tryMove(self.position.x, self.position.y + 1, constants.DIRECTIONS.DOWN)
+            self:tryMove(self.position.grid.x, self.position.grid.y + 1, constants.DIRECTIONS.DOWN)
         elseif self.desiredDirection == constants.DIRECTIONS.RIGHT then
-            self:tryMove(self.position.x + 1, self.position.y, constants.DIRECTIONS.RIGHT)
+            self:tryMove(self.position.grid.x + 1, self.position.grid.y, constants.DIRECTIONS.RIGHT)
         end
     end
 
@@ -143,17 +158,21 @@ function Player.new()
             local move = self.speed * dt
 
             if self.direction == constants.DIRECTIONS.UP then
-                self.position.y = math.max(self.position.y - move, self.targetPosition.y)
+                self.position.draw.y = math.max(self.position.draw.y - move, self.targetPosition.grid.y)
             elseif self.direction == constants.DIRECTIONS.LEFT then
-                self.position.x = math.max(self.position.x - move, self.targetPosition.x)
+                self.position.draw.x = math.max(self.position.draw.x - move, self.targetPosition.grid.x)
             elseif self.direction == constants.DIRECTIONS.DOWN then
-                self.position.y = math.min(self.position.y + move, self.targetPosition.y)
+                self.position.draw.y = math.min(self.position.draw.y + move, self.targetPosition.grid.y)
             elseif self.direction == constants.DIRECTIONS.RIGHT then
-                self.position.x = math.min(self.position.x + move, self.targetPosition.x)
+                self.position.draw.x = math.min(self.position.draw.x + move, self.targetPosition.grid.x)
             end
 
-            if self.position.x == self.targetPosition.x and self.position.y == self.targetPosition.y then
+            if self.position.draw.x == self.targetPosition.grid.x and self.position.draw.y == self.targetPosition.grid.y then
+                -- In entity manager
+                -- self.position.grid.x = self.targetPosition.grid.x
+                -- self.position.grid.y = self.targetPosition.grid.y
                 if not self.desiredDirection then
+
                     self.moving = false
                     self.animationFrame = 1
                     self.animationTimer = 0
@@ -166,13 +185,13 @@ function Player.new()
 
     function player:lookingAt()
         if self.direction == constants.DIRECTIONS.UP then
-            return { x = self.position.x, y = self.position.y - 1}
+            return { x = self.position.grid.x, y = self.position.grid.y - 1}
         elseif self.direction == constants.DIRECTIONS.RIGHT then
-            return { x = self.position.x + 1, y = self.position.y}
+            return { x = self.position.grid.x + 1, y = self.position.grid.y}
         elseif self.direction == constants.DIRECTIONS.DOWN then
-            return { x = self.position.x, y = self.position.y + 1}
+            return { x = self.position.grid.x, y = self.position.grid.y + 1}
         elseif self.direction == constants.DIRECTIONS.LEFT then
-            return { x = self.position.x - 1, y = self.position.y}
+            return { x = self.position.grid.x - 1, y = self.position.grid.y}
         end
     end
 
@@ -222,8 +241,8 @@ function Player.new()
         love.graphics.draw(
             self.spritesheet,
             self:getCurrentQuad(),
-            (self.position.x-1) * constants.TILE_SIZE,
-            (self.position.y-1) * constants.TILE_SIZE
+            (self.position.draw.x-1) * constants.TILE_SIZE,
+            (self.position.draw.y-1) * constants.TILE_SIZE
         )
 
         self.inventory:draw()

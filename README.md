@@ -12,7 +12,6 @@ The main inspiration is:
 
 ## Improvements
 
-- Separate tile position from draw position
 - Replace "magic" numbers with named constants
 - Simplify player movement and interaction logic ()
 - Treat trees as full objects instead of separate tiles

@@ -1,8 +1,10 @@
-local Player = require("src.actors.Player")
+local Player = require("src.entities.actors.Player")
 local map = require("src.world.map")
 local config = require("src.core.config")
 local mouse = require("src.core.mouse")
 local keyboard = require("src.core.keyboard")
+local Creatures = require("src.entities.creatures.creatures")
+local Entities = require("src.entities.entities")
 
 local game = {}
 
@@ -21,7 +23,10 @@ function game.load()
     map.load()
 
     player = Player.new()
+    Entities.new(player)
 
+    local bug = Creatures.new("bug", 10, 10)
+    Entities.new(bug)
 end
 
 function game.keypressed(key)
@@ -41,12 +46,15 @@ end
 
 function game.update(dt)
     keyboard.update(player)
+    Entities.update(dt)
     player:update(dt)
+    Creatures.update(dt, player)
 end
 
 function game.draw()
     map.drawGround()
     player:draw()
+    Creatures.draw()
     map.drawAbove()
 end
 
