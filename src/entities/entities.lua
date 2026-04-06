@@ -46,8 +46,8 @@ function Entities.commitMove(entity)
     local newX = entity.targetPosition.grid.x
     local newY = entity.targetPosition.grid.y
 
-    if reserved_grid[oldY] then
-        reserved_grid[oldY][oldX] = nil
+    if reserved_grid[newY] then
+        reserved_grid[newY][newX] = nil
     end
     if entities_grid[oldY] then
         entities_grid[oldY][oldX] = nil
@@ -62,7 +62,7 @@ end
 function Entities.update(dt)
     for k, v in pairs(entities_grid) do
         for j, vv in pairs(v) do
-            print(j)
+            --print(j)
         end
     end
 end
