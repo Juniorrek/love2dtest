@@ -109,12 +109,8 @@ function Player.new()
 
     function player:tryMove(x, y, direction)
         self.direction = direction
-        if map.movableTile(x, y) and not Entities.hasEntityAt(x, y) then
-            self.targetPosition.grid.x = x
-            self.targetPosition.grid.y = y
-            
-            Entities.moveEntity(self, self.targetPosition.grid.x, self.targetPosition.grid.y)
-
+        if map.movableTile(x, y) and Entities.isFreeAt(x, y) then
+            Entities.reserveTile(self, x, y)
             self.moving = true
         else 
             -- self.position.grid.x = self.targetPosition.grid.x
@@ -171,6 +167,7 @@ function Player.new()
                 -- In entity manager
                 -- self.position.grid.x = self.targetPosition.grid.x
                 -- self.position.grid.y = self.targetPosition.grid.y
+                Entities.commitMove(self)
                 if not self.desiredDirection then
 
                     self.moving = false

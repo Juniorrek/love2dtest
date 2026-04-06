@@ -57,13 +57,9 @@ function Creatures.new(creatureId, x, y)
     end
 
     function creature:tryMove(x, y, direction)
-        if map.movableTile(x, y) and not Entities.hasEntityAt(x, y) then
-            self.facing = direction
-            self.targetPosition.grid.x = x
-            self.targetPosition.grid.y = y
-            
-            Entities.moveEntity(self, self.targetPosition.grid.x, self.targetPosition.grid.y)
-            
+        self.facing = direction
+        if map.movableTile(x, y) and Entities.isFreeAt(x, y) then
+            Entities.reserveTile(self, x, y)
             self.state = "walking"
         end
     end
@@ -125,9 +121,7 @@ function Creatures.new(creatureId, x, y)
             end
 
             if self.position.draw.x == self.targetPosition.grid.x and self.position.draw.y == self.targetPosition.grid.y then
-                -- self.position.grid.x = self.targetPosition.grid.x
-                -- self.position.grid.y = self.targetPosition.grid.y
-                Entities.moveEntity(self, self.targetPosition.grid.x, self.targetPosition.grid.y)
+                Entities.commitMove(self)
 
                 self.state = "idle"
                 self.animationFrame = 1
@@ -154,10 +148,10 @@ function Creatures.update(dt, player)
     end
 end
 
-function Creatures.draw()
+--[[ function Creatures.draw()
     for k, v in ipairs(creatures_list) do
         v:draw()
     end
-end
+end ]]
 
 return Creatures

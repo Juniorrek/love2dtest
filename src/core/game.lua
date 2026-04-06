@@ -53,8 +53,7 @@ end
 
 function game.draw()
     map.drawGround()
-    player:draw()
-    Creatures.draw()
+    Entities.draw()
     map.drawAbove()
 end
 
