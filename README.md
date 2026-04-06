@@ -7,11 +7,8 @@ The main inspiration is:
 - Tibia for graphics and map feeling
 
 ## TODO
-- Be able to chop tree & get wood
-- Get fiber
-- Craft bonfire (wood and fiber)
-- Light things up
-- Add light system
+- COMBAT
+- Add hunger system & grab berries
 
 ## Improvements
 
