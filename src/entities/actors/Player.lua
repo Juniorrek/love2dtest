@@ -63,6 +63,7 @@ function Player.new()
 
     -- TABLE INSTANCE
     local player = {
+        hp = 100,
         position = {
             draw = {
                 x = 4,
@@ -93,6 +94,11 @@ function Player.new()
     }
 
     -- METHODS
+    function player:takeDamage(damage)
+        self.hp = self.hp - damage
+        print("AAAAAAAA")
+    end
+
     function player:equipItem(slotClicked)
         if self.equipment:canEquip(self.inventory.slots[slotClicked].id) then
             self.equipment:equip(self.inventory.slots[slotClicked])
@@ -244,6 +250,8 @@ function Player.new()
 
         self.inventory:draw()
         self.equipment:draw()
+
+        love.graphics.print("HP: " .. self.hp, 10, 10)
     end
 
     function player:craftItem(recipe)

@@ -35,7 +35,13 @@ local bug = {
                 util.makeQuad(sprites.creatures, 1, 13, 32, 32)
             }
         }
-    }
+    },
+    attackDamage = 1,
+    attackCooldown = 2,
+    attackSpeed = 1
 }
+
+bug.animationQuads.chasing = bug.animationQuads.walking
+bug.animationQuads.attacking = bug.animationQuads.idle
 
 return bug

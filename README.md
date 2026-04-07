@@ -8,7 +8,13 @@ The main inspiration is:
 
 ## TODO
 - COMBAT
+    - ~~Player take hit~~
+    - Fix creature movement around blocked tiles (maybe pathfinding?)
+- Place to hide from monster like (bushes)
 - Add hunger system & grab berries
+- Multiplayer
+    - Can be played singleplayer or multiplayer, but I think both will run a "server"
+    - Player can have multiple characters and "worlds" like Terraria (maybe need to think more about the worlds cause the world is mostly static but for sure would be areas "procedurally generated", or maybe the worlds to "hold" a state where the game is, cause the game will be a series of quests like Tibia and will be unlocking other areas)
 
 ## Improvements
 

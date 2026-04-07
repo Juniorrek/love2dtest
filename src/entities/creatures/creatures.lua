@@ -30,12 +30,24 @@ function Creatures.new(creatureId, x, y)
                 y = y
             }
         },
+        timers = {
+            attack = {
+                cooldown = creatures[creatureId].attackCooldown,
+                timer = 0,
+                speed = creatures[creatureId].attackSpeed
+            },
+            check = {
+                cooldown = 0.5,
+                timer = 0
+            }
+        },
         animationFrame = creatures[creatureId].animationFrame,
         animationTimer = creatures[creatureId].animationTimer,
         animationSpeed = creatures[creatureId].animationSpeed,
         facing = constants.DIRECTIONS.UP,
         state = "idle",
-        speed = creatures[creatureId].speed
+        speed = creatures[creatureId].speed,
+        attackDamage = creatures[creatureId].attackDamage
     }
 
     table.insert(creatures_list, creature)
@@ -56,11 +68,20 @@ function Creatures.new(creatureId, x, y)
         return false
     end
 
+    function creature:touchingPlayer(player)
+        local dx = player.position.grid.x - self.position.grid.x
+        local dy = player.position.grid.y - self.position.grid.y
+
+        if math.abs(dx) <= 1 and math.abs(dy) <= 1 then
+            return true
+        end
+        return false
+    end
+
     function creature:tryMove(x, y, direction)
         self.facing = direction
         if map.movableTile(x, y) and Entities.isFreeAt(x, y) then
             Entities.reserveTile(self, x, y)
-            self.state = "walking"
         end
     end
 
@@ -68,35 +89,66 @@ function Creatures.new(creatureId, x, y)
         local dx = player.position.grid.x - self.position.grid.x
         local dy = player.position.grid.y - self.position.grid.y
 
-        local tryMove = nil
-        --self.state = "walking"
         if math.abs(dx) > math.abs(dy) then
             if player.position.grid.x > self.position.grid.x then
-                self:tryMove(self.position.grid.x+1, self.position.grid.y, constants.DIRECTIONS.RIGHT)
-                tryMove = "east"
+                self:tryMove(self.position.grid.x+1, 
+                    self.position.grid.y, 
+                    constants.DIRECTIONS.RIGHT
+                )
             else
                 self:tryMove(self.position.grid.x-1, self.position.grid.y, constants.DIRECTIONS.LEFT)
-                tryMove = "west"
             end
         else
             if player.position.grid.y > self.position.grid.y then
                 self:tryMove(self.position.grid.x, self.position.grid.y+1, constants.DIRECTIONS.DOWN)
-                tryMove = "south"
             else
                 self:tryMove(self.position.grid.x, self.position.grid.y-1, constants.DIRECTIONS.UP)
-                tryMove = "north"
             end
         end
     end
 
+    function creature:attack(dt, player)
+        self.timers.check.timer = self.timers.check.timer + dt
+        --self.timers.attack.timer = self.timers.attack.timer + dt * self.timers.attack.speed
+
+        if self.timers.check.timer >= self.timers.check.cooldown then
+            self.timers.check.timer = 0
+            local dx = player.position.grid.x - self.position.grid.x
+            local dy = player.position.grid.y - self.position.grid.y
+
+            if player.position.grid.x > self.position.grid.x then
+                self.facing = constants.DIRECTIONS.RIGHT
+            elseif player.position.grid.x < self.position.grid.x then
+                self.facing = constants.DIRECTIONS.LEFT
+            elseif player.position.grid.y > self.position.grid.y then
+                self.facing = constants.DIRECTIONS.DOWN
+            elseif player.position.grid.y < self.position.grid.y then
+                self.facing = constants.DIRECTIONS.UP
+            end
+        end
+
+        if self.timers.attack.timer >= self.timers.attack.cooldown then
+            self.timers.attack.timer = 0
+            player:takeDamage(self.attackDamage)
+        end
+    end
+
     function creature:update(dt, player)
+        self.timers.attack.timer = self.timers.attack.timer + dt * self.timers.attack.speed
+
+        if self.timers.attack.timer > self.timers.attack.cooldown then
+            self.timers.attack.timer = self.timers.attack.cooldown
+        end
+
+        print(self.state)
         if self.state == "idle" then
             if self:playerClose(player) then
+                self.state = "chasing"
                 self:aggroPlayer(player)
             end
         end
 
-        if self.state == "walking" then
+        if self.state == "chasing" then
             self.animationTimer = self.animationTimer + dt
 
             if self.animationTimer >= self.animationSpeed then
@@ -123,9 +175,33 @@ function Creatures.new(creatureId, x, y)
             if self.position.draw.x == self.targetPosition.grid.x and self.position.draw.y == self.targetPosition.grid.y then
                 Entities.commitMove(self)
 
-                self.state = "idle"
-                self.animationFrame = 1
-                self.animationTimer = 0
+                if self:touchingPlayer(player) then
+                    self.state = "attacking"
+                    self.animationFrame = 1
+                    self.animationTimer = 0
+                elseif self:playerClose(player) then
+                    self.state = "chasing"
+                    self:aggroPlayer(player)
+                else
+                    self.state = "idle"
+                    self.animationFrame = 1
+                    self.animationTimer = 0
+                end
+            end
+        end
+
+        if self.state == "attacking" then
+            if self:touchingPlayer(player) then
+                self:attack(dt, player)
+            else
+                if self:playerClose(player) then
+                    self.state = "chasing"
+                    self:aggroPlayer(player)
+                else
+                    self.state = "idle"
+                    self.animationFrame = 1
+                    self.animationTimer = 0
+                end
             end
         end
     end
