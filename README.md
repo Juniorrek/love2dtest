@@ -9,10 +9,6 @@ The main inspiration is:
 ## TODO
 - COMBAT
     - ~~Player take hit~~
-    - Camera
-        - Only draw tiles and everything else at camera (maybe get rid of sti?)
-            - ~~ground~~
-            - other
     - Player attack closest creature (attackTarget) with hotkey
         - List closests creatures. Based on player position on map, creatures outside the view range doesn't appear on "battle list"
     - Add player attack cooldown/timer

@@ -115,61 +115,67 @@ end
     return tileX, tileY
 end
 
-function map.drawObjects()
-    for y,v in pairs(map.objects) do
-        for x, obj in pairs(v) do
-            if obj ~= nil then
-                local tileX = (x - 1) * constants.TILE_SIZE
-                local tileY = (y - 1) * constants.TILE_SIZE
-
-                love.graphics.draw(
-                    items[obj.id].spritesheet,
-                    items[obj.id].sptsQuad,
-                    tileX,
-                    tileY
-                )
+function map.drawObjects(camera)
+    for y = camera.startY, camera.endY do
+        for x = camera.startX, camera.endX do
+            if map.objects[y] then
+                local obj = map.objects[y][x]
+                if obj ~= nil then
+                    love.graphics.draw(
+                        items[obj.id].spritesheet,
+                        items[obj.id].sptsQuad,
+                        (x-1) * constants.TILE_SIZE,
+                        (y-1) * constants.TILE_SIZE
+                    )
+                end
             end
         end
     end
 end
 
 function map.drawGround(camera)
-    local tiles = 0
-    --[[ for y, v in pairs(map.tilemap.layers["Ground"].data) do
-        for x, vv in pairs(v) do
-            love.graphics.draw(
-                map.tilemap.tilesets[vv.tileset].image,
-                vv.quad,
-                (x-1) * constants.TILE_SIZE,
-                (y-1) * constants.TILE_SIZE
-            )
-            tiles = tiles + 1
-        end
-    end ]]
-
     for y = camera.startY, camera.endY do
         for x = camera.startX, camera.endX do
-            local vv = map.tilemap.layers["Ground"].data[y][x]
-            if vv ~= nil then
+            local groundTile = map.tilemap.layers["Ground"].data[y][x]
+            if groundTile ~= nil then
                 love.graphics.draw(
-                    map.tilemap.tilesets[vv.tileset].image,
-                    vv.quad,
+                    map.tilemap.tilesets[groundTile.tileset].image,
+                    groundTile.quad,
                     (x-1) * constants.TILE_SIZE,
                     (y-1) * constants.TILE_SIZE
                 )
-                tiles = tiles + 1
+            end
+
+            local natureTile = map.tilemap.layers["Nature.Nature"].data[y][x]
+            if natureTile ~= nil then
+                love.graphics.draw(
+                    map.tilemap.tilesets[natureTile.tileset].image,
+                    natureTile.quad,
+                    (x-1) * constants.TILE_SIZE,
+                    (y-1) * constants.TILE_SIZE
+                )
             end
         end
     end
-    print(tiles)
-    --map.tilemap:drawTileLayer("Ground")
-    map.tilemap:drawTileLayer("Nature.Nature")
 
-    map.drawObjects()
+    map.drawObjects(camera)
 end
 
-function map.drawAbove()
-    map.tilemap:drawTileLayer("Nature.Above Nature")
+function map.drawAbove(camera)
+    for y = camera.startY, camera.endY do
+        for x = camera.startX, camera.endX do
+            local natureAbove = map.tilemap.layers["Nature.Above Nature"].data[y][x]
+            if natureAbove ~= nil then
+                love.graphics.draw(
+                    map.tilemap.tilesets[natureAbove.tileset].image,
+                    natureAbove.quad,
+                    (x-1) * constants.TILE_SIZE,
+                    (y-1) * constants.TILE_SIZE
+                )
+            end
+        end
+    end
+
     light.draw(map.objects)
 end
 

@@ -60,7 +60,7 @@ function game.draw()
 
     map.drawGround(camera)
     Entities.draw()
-    map.drawAbove()
+    map.drawAbove(camera)
 
     love.graphics.pop()
 
