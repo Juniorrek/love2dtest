@@ -66,8 +66,8 @@ function Player.new()
         hp = 100,
         position = {
             draw = {
-                x = 4,
-                y = 4
+                x = (4-1) * constants.TILE_SIZE,
+                y = (4-1) * constants.TILE_SIZE
             },
             grid = {
                 x = 4,
@@ -157,19 +157,21 @@ function Player.new()
                 end
             end
 
-            local move = self.speed * dt
+            local move = self.speed * dt * constants.TILE_SIZE
+            local targetDrawX = (self.targetPosition.grid.x-1) * constants.TILE_SIZE
+            local targetDrawY = (self.targetPosition.grid.y-1) * constants.TILE_SIZE
 
             if self.direction == constants.DIRECTIONS.UP then
-                self.position.draw.y = math.max(self.position.draw.y - move, self.targetPosition.grid.y)
+                self.position.draw.y = math.max(self.position.draw.y - move, targetDrawY)
             elseif self.direction == constants.DIRECTIONS.LEFT then
-                self.position.draw.x = math.max(self.position.draw.x - move, self.targetPosition.grid.x)
+                self.position.draw.x = math.max(self.position.draw.x - move, targetDrawX)
             elseif self.direction == constants.DIRECTIONS.DOWN then
-                self.position.draw.y = math.min(self.position.draw.y + move, self.targetPosition.grid.y)
+                self.position.draw.y = math.min(self.position.draw.y + move, targetDrawY)
             elseif self.direction == constants.DIRECTIONS.RIGHT then
-                self.position.draw.x = math.min(self.position.draw.x + move, self.targetPosition.grid.x)
+                self.position.draw.x = math.min(self.position.draw.x + move, targetDrawX)
             end
 
-            if self.position.draw.x == self.targetPosition.grid.x and self.position.draw.y == self.targetPosition.grid.y then
+            if self.position.draw.x == targetDrawX and self.position.draw.y == targetDrawY then
                 -- In entity manager
                 -- self.position.grid.x = self.targetPosition.grid.x
                 -- self.position.grid.y = self.targetPosition.grid.y
@@ -244,10 +246,12 @@ function Player.new()
         love.graphics.draw(
             self.spritesheet,
             self:getCurrentQuad(),
-            (self.position.draw.x-1) * constants.TILE_SIZE,
-            (self.position.draw.y-1) * constants.TILE_SIZE
+            self.position.draw.x,
+            self.position.draw.y
         )
+    end
 
+    function player:drawUi()
         self.inventory:draw()
         self.equipment:draw()
 

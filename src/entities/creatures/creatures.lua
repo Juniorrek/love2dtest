@@ -140,7 +140,7 @@ function Creatures.new(creatureId, x, y)
             self.timers.attack.timer = self.timers.attack.cooldown
         end
 
-        print(self.state)
+        --print(self.state)
         if self.state == "idle" then
             if self:playerClose(player) then
                 self.state = "chasing"

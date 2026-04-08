@@ -5,6 +5,8 @@ local mouse = require("src.core.mouse")
 local keyboard = require("src.core.keyboard")
 local Creatures = require("src.entities.creatures.creatures")
 local Entities = require("src.entities.entities")
+local camera = require("src.core.camera")
+local conf = require("conf")
 
 local game = {}
 
@@ -49,12 +51,23 @@ function game.update(dt)
     Entities.update(dt)
     player:update(dt)
     Creatures.update(dt, player)
+    camera.update(player)
 end
 
 function game.draw()
+    love.graphics.push()
+    love.graphics.translate(-camera.x, -camera.y)
+
     map.drawGround()
     Entities.draw()
     map.drawAbove()
+
+    love.graphics.pop()
+
+    player:drawUi()
+
+    love.graphics.line(0, conf.WINDOW_HEIGHT/2, conf.WINDOW_WIDTH, conf.WINDOW_HEIGHT/2)
+    love.graphics.line(conf.WINDOW_WIDTH/2, 0, conf.WINDOW_WIDTH/2, conf.WINDOW_HEIGHT)
 end
 
 return game

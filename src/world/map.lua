@@ -34,6 +34,9 @@ function map.load()
 
     nature.randomGeneration(map, items.stone.id)
     nature.randomGeneration(map, items.fiber.id)
+
+    map.width = map.tilemap.width * map.tilemap.tilewidth
+    map.height = map.tilemap.height * map.tilemap.tileheight
 end
 
 local chopTreeSfx = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
