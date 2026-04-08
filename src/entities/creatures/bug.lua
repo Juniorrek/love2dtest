@@ -2,6 +2,7 @@ local sprites = require("src.util.sprites")
 local util = require("src.util.util")
 
 local bug = {
+    hp = 15,
     spritesheet = sprites.creatures,
     aggroRange = 3,
     animationFrame = 1,
@@ -36,7 +37,7 @@ local bug = {
             }
         }
     },
-    attackDamage = 1,
+    attackDamage = 3,
     attackCooldown = 2,
     attackSpeed = 1
 }

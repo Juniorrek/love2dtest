@@ -1,3 +1,5 @@
+local util = require("src.util.util")
+
 local Entities = {}
 
 local entities_grid = {}
@@ -5,19 +7,12 @@ local reserved_grid = {}
 
 local entities_list = {}
 
-local function setOnGrid(grid, x, y, value)
-    if grid[y] == nil then
-        grid[y] = {}
-    end
-    grid[y][x] = value
-end
-
 function Entities.new(entity)
     local entity = entity
 
     table.insert(entities_list, entity)
 
-    setOnGrid(entities_grid, entity.position.grid.x, entity.position.grid.y, entity)
+    util.setOnGrid(entities_grid, entity.position.grid.x, entity.position.grid.y, entity)
 
     return entity
 end
@@ -35,7 +30,7 @@ function Entities.isFreeAt(x, y)
 end
 
 function Entities.reserveTile(entity, newX, newY)
-    setOnGrid(reserved_grid, newX, newY, entity)
+    util.setOnGrid(reserved_grid, newX, newY, entity)
     entity.targetPosition.grid.x = newX
     entity.targetPosition.grid.y = newY
 end
@@ -53,7 +48,7 @@ function Entities.commitMove(entity)
         entities_grid[oldY][oldX] = nil
     end
 
-    setOnGrid(entities_grid, newX, newY, entity)
+    util.setOnGrid(entities_grid, newX, newY, entity)
 
     entity.position.grid.x = newX
     entity.position.grid.y = newY
@@ -67,13 +62,13 @@ function Entities.update(dt)
     end
 end
 
-function Entities.draw()
-    table.sort(entities_list, function(a, b) 
-        return a.position.draw.y < b.position.draw.y
-    end)
-
-    for k, v in ipairs(entities_list) do
-        v:draw()
+function Entities.draw(camera)
+    for y = camera.startY, camera.endY do
+        for x = camera.startX, camera.endX do
+            if entities_grid[y] and entities_grid[y][x] then
+                entities_grid[y][x]:draw()
+            end
+        end
     end
 end
 

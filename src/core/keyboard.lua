@@ -3,6 +3,8 @@ local Recipes = require("src.items.recipes")
 local items = require("src.items.items")
 local sfx = require("src.sound.sfx")
 local constants = require("src.core.constants")
+local map = require("src.world.map")
+local Creatures = require("src.entities.creatures.creatures")
 
 function keyboard.handleKeyPressed(key, player)
     if key == "c" then
@@ -15,13 +17,22 @@ function keyboard.handleKeyPressed(key, player)
         if success then
             sfx:playItemSfx("craft", items.bonfire.id)
         end
-    elseif key == "space" then
+    elseif key == "g" then
         if not player.moving then
             --TODO looking at return the upper object ID
             local lookingAt = player:lookingAt()
 
             player:interact(lookingAt.x, lookingAt.y)
         end
+    elseif key == "space" then
+        --callback ou como feito acima retornando e verificando se é nil ou não
+        Creatures.getClosestTo(player.position.grid.x, player.position.grid.y, function(enemy)
+            print(enemy.position.grid.x)
+            player:target(enemy)
+        --map.getClosestEnemy(player, function(enemy)
+            --player:target
+            --player:attack(enemy)
+        end)
     end
 end
 

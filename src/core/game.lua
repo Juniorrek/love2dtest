@@ -19,8 +19,6 @@ function game.load()
     if conf.sound == "on" then
         love.audio.play(ambienceSound)
     end
-
-    --TODO game informs map lua
     map.load()
 
     player = Player.new()
@@ -28,6 +26,8 @@ function game.load()
 
     local bug = Creatures.new("bug", 10, 10)
     Entities.new(bug)
+    local bug2 = Creatures.new("bug", 28, 2)
+    Entities.new(bug2)
 end
 
 function game.keypressed(key)
@@ -58,7 +58,7 @@ function game.draw()
     love.graphics.translate(-camera.x, -camera.y)
 
     map.drawGround(camera)
-    Entities.draw()
+    Entities.draw(camera)
     map.drawAbove(camera)
 
     love.graphics.pop()

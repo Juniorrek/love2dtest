@@ -28,4 +28,11 @@ function util.countElementsSparseTable(t)
     return count
 end
 
+function util.setOnGrid(grid, x, y, value)
+    if grid[y] == nil then
+        grid[y] = {}
+    end
+    grid[y][x] = value
+end
+
 return util

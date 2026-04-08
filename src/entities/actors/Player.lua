@@ -90,10 +90,21 @@ function Player.new()
         animationSpeed = 0.2,
         animationsQuads = buildAnimations(spritesheet),
         inventory = Inventory.new(5),
-        equipment = Equipment.new()
+        equipment = Equipment.new(),
+        attack = {
+            target = nil,
+            damage = 5,
+            speed = 2,
+            cooldown = 2,
+            timer = 0
+        }
     }
 
     -- METHODS
+    function player:target(enemy)
+        self.attack.target = enemy
+    end
+
     function player:takeDamage(damage)
         self.hp = self.hp - damage
         print("AAAAAAAA")
@@ -172,9 +183,6 @@ function Player.new()
             end
 
             if self.position.draw.x == targetDrawX and self.position.draw.y == targetDrawY then
-                -- In entity manager
-                -- self.position.grid.x = self.targetPosition.grid.x
-                -- self.position.grid.y = self.targetPosition.grid.y
                 Entities.commitMove(self)
                 if not self.desiredDirection then
 
@@ -186,6 +194,29 @@ function Player.new()
                 end
             end
         end
+
+        if self.attack.target then
+            if player:touchingTarget() then
+                print("BAAAAM")
+                --self:aggroPlayer(self.attack.target)
+            else
+                --self.attack.target = nil
+            end
+        end
+    end
+
+    function player:touchingTarget()
+        if not self.attack.target then
+            return false
+        end
+
+        local dx = self.attack.target.position.grid.x - self.position.grid.x
+        local dy = self.attack.target.position.grid.y - self.position.grid.y
+
+        if math.abs(dx) <= 1 and math.abs(dy) <= 1 then
+            return true
+        end
+        return false
     end
 
     function player:lookingAt()
@@ -256,6 +287,19 @@ function Player.new()
         self.equipment:draw()
 
         love.graphics.print("HP: " .. self.hp, 10, 10)
+
+        if self.attack.target then
+            player:drawTargetLine()
+        end
+    end
+
+    function player:drawTargetLine()
+        if self.attack.target then
+            love.graphics.setColor(1, 0, 0)
+            love.graphics.setLineWidth(2)
+            love.graphics.rectangle("line", self.attack.target.position.draw.x, self.attack.target.position.draw.y, constants.TILE_SIZE, constants.TILE_SIZE)
+            love.graphics.setColor(1, 1, 1)
+        end
     end
 
     function player:craftItem(recipe)
