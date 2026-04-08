@@ -9,6 +9,10 @@ The main inspiration is:
 ## TODO
 - COMBAT
     - ~~Player take hit~~
+    - Player attack closest creature (attackTarget) with hotkey
+        - List closests creatures. Based on player position on map, creatures outside the view range doesn't appear on "battle list"
+    - Add player attack cooldown/timer
+    - Mouse click target
     - Fix creature movement around blocked tiles (maybe pathfinding?)
 - Place to hide from monster like (bushes)
 - Add hunger system & grab berries
