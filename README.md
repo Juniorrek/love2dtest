@@ -9,6 +9,10 @@ The main inspiration is:
 ## TODO
 - COMBAT
     - ~~Player take hit~~
+    - Camera
+        - Only draw tiles and everything else at camera (maybe get rid of sti?)
+            - ~~ground~~
+            - other
     - Player attack closest creature (attackTarget) with hotkey
         - List closests creatures. Based on player position on map, creatures outside the view range doesn't appear on "battle list"
     - Add player attack cooldown/timer
@@ -48,16 +52,18 @@ The main inspiration is:
 - Improve light system with a dark overlay +  light spots...
 
 ## Studies for later
-State machine
--   normal, dragging, placing
-Controller pattern
--   keyboard/mouse convert input into actions
-Single responsibility
--   player is not also input manager and map editor
-Data-driven definitions
--   items and harvestable objects described by tables
-World object abstraction
--   dropped wood and bonfire can both live in a world-object system
+- State machine
+    - normal, dragging, placing
+- Controller pattern
+    - keyboard/mouse convert input into actions
+- Single responsibility
+    - player is not also input manager and map editor
+- Data-driven definitions
+    - items and harvestable objects described by tables
+- World object abstraction
+    - dropped wood and bonfire can both live in a world-object system
+- Differences between transform and camera offset
+- Window width vs camera width (big monitor see more or fixed?)
 
 
 ## References to check later

@@ -58,7 +58,7 @@ function game.draw()
     love.graphics.push()
     love.graphics.translate(-camera.x, -camera.y)
 
-    map.drawGround()
+    map.drawGround(camera)
     Entities.draw()
     map.drawAbove()
 

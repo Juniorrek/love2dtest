@@ -133,8 +133,36 @@ function map.drawObjects()
     end
 end
 
-function map.drawGround()
-    map.tilemap:drawTileLayer("Ground")
+function map.drawGround(camera)
+    local tiles = 0
+    --[[ for y, v in pairs(map.tilemap.layers["Ground"].data) do
+        for x, vv in pairs(v) do
+            love.graphics.draw(
+                map.tilemap.tilesets[vv.tileset].image,
+                vv.quad,
+                (x-1) * constants.TILE_SIZE,
+                (y-1) * constants.TILE_SIZE
+            )
+            tiles = tiles + 1
+        end
+    end ]]
+
+    for y = camera.startY, camera.endY do
+        for x = camera.startX, camera.endX do
+            local vv = map.tilemap.layers["Ground"].data[y][x]
+            if vv ~= nil then
+                love.graphics.draw(
+                    map.tilemap.tilesets[vv.tileset].image,
+                    vv.quad,
+                    (x-1) * constants.TILE_SIZE,
+                    (y-1) * constants.TILE_SIZE
+                )
+                tiles = tiles + 1
+            end
+        end
+    end
+    print(tiles)
+    --map.tilemap:drawTileLayer("Ground")
     map.tilemap:drawTileLayer("Nature.Nature")
 
     map.drawObjects()
