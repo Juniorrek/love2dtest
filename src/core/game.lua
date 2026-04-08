@@ -1,6 +1,5 @@
 local Player = require("src.entities.actors.Player")
 local map = require("src.world.map")
-local config = require("src.core.config")
 local mouse = require("src.core.mouse")
 local keyboard = require("src.core.keyboard")
 local Creatures = require("src.entities.creatures.creatures")
@@ -17,7 +16,7 @@ function game.load()
     love.graphics.setBackgroundColor(0, 0.7, 1)
 
     local ambienceSound = love.audio.newSource("assets/audio/music/meadowAmbience.ogg", "stream")
-    if config.sound == "on" then
+    if conf.sound == "on" then
         love.audio.play(ambienceSound)
     end
 
@@ -66,8 +65,11 @@ function game.draw()
 
     player:drawUi()
 
-    love.graphics.line(0, conf.WINDOW_HEIGHT/2, conf.WINDOW_WIDTH, conf.WINDOW_HEIGHT/2)
-    love.graphics.line(conf.WINDOW_WIDTH/2, 0, conf.WINDOW_WIDTH/2, conf.WINDOW_HEIGHT)
+
+    if conf.debug == "on" then
+        love.graphics.line(0, conf.WINDOW_HEIGHT/2, conf.WINDOW_WIDTH, conf.WINDOW_HEIGHT/2)
+        love.graphics.line(conf.WINDOW_WIDTH/2, 0, conf.WINDOW_WIDTH/2, conf.WINDOW_HEIGHT)
+    end
 end
 
 return game
