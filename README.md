@@ -22,6 +22,7 @@ The main inspiration is:
 
 ## Improvements
 
+- Improve things drawn in screen only in camera view
 - Replace "magic" numbers with named constants
 - Simplify player movement and interaction logic ()
 - Treat trees as full objects instead of separate tiles
