@@ -20,6 +20,15 @@ function map.loadObjectsFromTiles()
                         id = items.stone.id,
                         qnt = 1
                     }
+                elseif tile.id == nature.tiles.BRANCH then
+                    if map.objects[y] == nil then
+                        map.objects[y] = {}
+                    end
+
+                    map.objects[y][x] = {
+                        id = items.branch.id,
+                        qnt = 1
+                    }
                 end
             end
         end
