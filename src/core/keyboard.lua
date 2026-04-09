@@ -26,13 +26,10 @@ function keyboard.handleKeyPressed(key, player)
         end
     elseif key == "space" then
         --callback ou como feito acima retornando e verificando se é nil ou não
-        Creatures.getClosestTo(player.position.grid.x, player.position.grid.y, function(enemy)
-            print(enemy.position.grid.x)
-            player:target(enemy)
-        --map.getClosestEnemy(player, function(enemy)
-            --player:target
-            --player:attack(enemy)
-        end)
+        player:targetNextCreatureInBattleList()
+        --[[ Creatures.getClosestTo(player.position.grid.x, player.position.grid.y, function(creature)
+            player:target(creature)
+        end) ]]
     end
 end
 

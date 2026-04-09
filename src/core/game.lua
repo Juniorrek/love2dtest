@@ -48,7 +48,7 @@ end
 function game.update(dt)
     keyboard.update(player)
     Entities.update(dt)
-    player:update(dt)
+    player:update(dt, camera)
     Creatures.update(dt, player)
     camera.update(player)
 end
@@ -64,7 +64,6 @@ function game.draw()
     love.graphics.pop()
 
     player:drawUi()
-
 
     if conf.debug == "on" then
         love.graphics.line(0, conf.WINDOW_HEIGHT/2, conf.WINDOW_WIDTH, conf.WINDOW_HEIGHT/2)

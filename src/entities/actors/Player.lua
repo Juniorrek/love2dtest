@@ -7,6 +7,7 @@ local util = require("src.util.util")
 local Equipment = require("src.entities.actors.Equipment")
 local sfx = require("src.sound.sfx")
 local Entities = require("src.entities.entities")
+local BattleList = require("src.entities.actors.BattleList")
 
 -- MODULE
 local Player = {}
@@ -97,12 +98,20 @@ function Player.new()
             speed = 2,
             cooldown = 2,
             timer = 0
-        }
+        },
+        battleList = BattleList.new()
     }
 
     -- METHODS
-    function player:target(enemy)
-        self.attack.target = enemy
+    function player:target(entity)
+        self.attack.target = entity
+    end
+
+    function player:targetNextCreatureInBattleList()
+        local nextTarget = self.battleList:getNext()
+        if nextTarget then
+            self:target(nextTarget)
+        end
     end
 
     function player:takeDamage(damage)
@@ -151,7 +160,9 @@ function Player.new()
         end
     end
 
-    function player:update(dt)
+    function player:update(dt, camera)
+        self.battleList:update(camera)
+
         if not self.moving and self.desiredDirection then
             self:moveFromDesiredDirection()
         end
@@ -280,6 +291,10 @@ function Player.new()
             self.position.draw.x,
             self.position.draw.y
         )
+
+        if self.attack.target then
+            player:drawTargetLine()
+        end
     end
 
     function player:drawUi()
@@ -288,9 +303,7 @@ function Player.new()
 
         love.graphics.print("HP: " .. self.hp, 10, 10)
 
-        if self.attack.target then
-            player:drawTargetLine()
-        end
+        self.battleList:draw(self.attack.target)
     end
 
     function player:drawTargetLine()
@@ -299,6 +312,7 @@ function Player.new()
             love.graphics.setLineWidth(2)
             love.graphics.rectangle("line", self.attack.target.position.draw.x, self.attack.target.position.draw.y, constants.TILE_SIZE, constants.TILE_SIZE)
             love.graphics.setColor(1, 1, 1)
+            love.graphics.setLineWidth(1)
         end
     end
 

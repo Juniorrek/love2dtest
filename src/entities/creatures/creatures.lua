@@ -16,6 +16,7 @@ local creatures_grid = {}
 function Creatures.new(creatureId, x, y)
     local creature = {
         id = creatureId,
+        name = creatures[creatureId].name,
         hp = creatures[creatureId].hp,
         position = {
             draw = {
@@ -198,13 +199,13 @@ function Creatures.new(creatureId, x, y)
             end
 
             if self.position.draw.x == targetDrawX and self.position.draw.y == targetDrawY then
-                Entities.commitMove(self)
-
                 --updates the creatures_grid
                 if creatures_grid[self.position.grid.y] then
                     creatures_grid[self.position.grid.y][self.position.grid.x] = nil
                 end
                 util.setOnGrid(creatures_grid, self.targetPosition.grid.x, self.targetPosition.grid.y, self)
+
+                Entities.commitMove(self)
 
                 if self:touchingPlayer(player) then
                     self.state = "attacking"
@@ -268,6 +269,19 @@ function Creatures.getClosestTo(x, y, callback)
             end
         end
     end
+end
+
+function Creatures.getInCamera(camera, battleList)
+    local inCamera = {}
+     for y = camera.startY, camera.endY do
+        for x = camera.startX, camera.endX do
+            if creatures_grid[y] and creatures_grid[y][x] then
+                local creature = creatures_grid[y][x]
+                table.insert(inCamera, creature)
+            end
+        end
+    end
+    return inCamera
 end
 
 return Creatures
