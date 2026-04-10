@@ -13,8 +13,15 @@ local creatures = {
 local creatures_list = {}
 local creatures_grid = {}
 
+local uidCounter = 0
+local function getUID()
+    uidCounter = uidCounter + 1
+    return uidCounter
+end
+
 function Creatures.new(creatureId, x, y)
     local creature = {
+        uid = getUID(),
         id = creatureId,
         name = creatures[creatureId].name,
         hp = creatures[creatureId].hp,
@@ -271,7 +278,7 @@ function Creatures.getClosestTo(x, y, callback)
     end
 end
 
-function Creatures.getInCamera(camera, battleList)
+function Creatures.getInCamera(camera)
     local inCamera = {}
      for y = camera.startY, camera.endY do
         for x = camera.startX, camera.endX do

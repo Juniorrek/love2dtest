@@ -110,7 +110,9 @@ function Player.new()
     function player:targetNextCreatureInBattleList()
         local nextTarget = self.battleList:getNext()
         if nextTarget then
-            self:target(nextTarget)
+            self:target(nextTarget.creature)
+        else
+            self.attack.target = nil
         end
     end
 
@@ -303,7 +305,7 @@ function Player.new()
 
         love.graphics.print("HP: " .. self.hp, 10, 10)
 
-        self.battleList:draw(self.attack.target)
+        self.battleList:draw(self)
     end
 
     function player:drawTargetLine()
