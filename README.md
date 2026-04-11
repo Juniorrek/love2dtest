@@ -7,6 +7,19 @@ The main inspiration is:
 - Tibia for graphics and map feeling
 
 ## TODO
+- NETWORK
+    Create the base folders: src/server, src/client, src/shared.
+    Create src/shared/protocol.lua with the first packet/message names.
+    Create a minimal server that starts and accepts connections.
+    Make the server create one player per connected client.
+    Make the client connect to the server and receive its player id.
+    Create a simple client input state: up, down, left, right.
+    Send that input from client to server.
+    Move players only on the server.
+    Broadcast player positions from server to all clients.
+    Draw local and remote players on the client.
+    Test with 2 clients on localhost first.
+    Test with 2 different machines after localhost works.
 - COMBAT
     - ~~Player take hit~~
     - Battle list
