@@ -6,7 +6,8 @@ local light = require("src.world.light")
 local sti = require("libraries.sti")
 
 local map = {
-    loaded = false
+    loaded = false,
+    tilemapLoaded = false
 }
 
 function map.loadObjectsFromTiles()
@@ -41,8 +42,17 @@ function map.isLoaded()
     return map.loaded
 end
 
-function map.load()
+function map.isTilemapLoaded()
+    return map.tilemapLoaded
+end
+
+function map.loadTilemap()
     map.tilemap = sti("assets/map.lua")
+    map.loaded = true
+end
+
+function map.load()
+    map.loadTilemap()
 
     map.objects = {}
     map.loadObjectsFromTiles()
@@ -196,9 +206,6 @@ function map.drawAbove(camera)
     light.draw(map.objects)
 end
 
-local groundTileset = love.graphics.newImage("assets/images/other/otsp_tiles_01.png")
-local fixedQuad = love.graphics.newQuad(1, 1, 32, 32, groundTileset:getDimensions())
-
 function map.drawGroundByParameter(groundData)
     --for y = camera.startY, camera.endY do
     --    for x = camera.startX, camera.endX do
@@ -207,10 +214,8 @@ function map.drawGroundByParameter(groundData)
             local groundTile = vv
             if groundTile ~= nil then
                 love.graphics.draw(
-                    --map.tilemap.tilesets[groundTile.tileset].image,
-                    groundTileset, --TEMPORARY HARDCODE
-                    fixedQuad, -- WIP QUAD NOT BEING SEND CORRECTLY
-                    -- "Quad: 0x028fe89b3640"
+                    map.tilemap.tilesets[map.tilemap.tiles[groundTile].tileset].image, 
+                    map.tilemap.tiles[groundTile].quad,
                     (x-1) * constants.TILE_SIZE,
                     (y-1) * constants.TILE_SIZE
                 )
