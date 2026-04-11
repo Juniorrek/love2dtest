@@ -31,10 +31,6 @@ function game.load()
 end
 
 function game.keypressed(key)
-    if key == "escape" then
-        love.event.quit()
-    end
-
     keyboard.handleKeyPressed(key, player)
 end
 

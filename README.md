@@ -8,6 +8,7 @@ The main inspiration is:
 
 ## TODO
 - NETWORK
+    1. Draw ground on client sent by server
     Create the base folders: src/server, src/client, src/shared.
     Create src/shared/protocol.lua with the first packet/message names.
     Create a minimal server that starts and accepts connections.

@@ -5,7 +5,9 @@ local light = require("src.world.light")
 
 local sti = require("libraries.sti")
 
-local map = {}
+local map = {
+    loaded = false
+}
 
 function map.loadObjectsFromTiles()
     for y,v in ipairs(map.tilemap.layers["Nature.Objects"].data) do
@@ -35,6 +37,10 @@ function map.loadObjectsFromTiles()
     end
 end
 
+function map.isLoaded()
+    return map.loaded
+end
+
 function map.load()
     map.tilemap = sti("assets/map.lua")
 
@@ -46,6 +52,8 @@ function map.load()
 
     map.width = map.tilemap.width * map.tilemap.tilewidth
     map.height = map.tilemap.height * map.tilemap.tileheight
+
+    map.loaded = true
 end
 
 local chopTreeSfx = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
@@ -186,6 +194,29 @@ function map.drawAbove(camera)
     end
 
     light.draw(map.objects)
+end
+
+local groundTileset = love.graphics.newImage("assets/images/other/otsp_tiles_01.png")
+local fixedQuad = love.graphics.newQuad(1, 1, 32, 32, groundTileset:getDimensions())
+
+function map.drawGroundByParameter(groundData)
+    --for y = camera.startY, camera.endY do
+    --    for x = camera.startX, camera.endX do
+    for y, v in ipairs(groundData) do
+        for x, vv in ipairs(v) do
+            local groundTile = vv
+            if groundTile ~= nil then
+                love.graphics.draw(
+                    --map.tilemap.tilesets[groundTile.tileset].image,
+                    groundTileset, --TEMPORARY HARDCODE
+                    fixedQuad, -- WIP QUAD NOT BEING SEND CORRECTLY
+                    -- "Quad: 0x028fe89b3640"
+                    (x-1) * constants.TILE_SIZE,
+                    (y-1) * constants.TILE_SIZE
+                )
+            end
+        end
+    end
 end
 
 return map
