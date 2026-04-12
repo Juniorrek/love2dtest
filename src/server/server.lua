@@ -36,17 +36,30 @@ function Server.update()
                     type = "map",
                     width = map.tilemap.width,
                     height = map.tilemap.height,
-                    ground = {}
+                    map = {
+                        layers = {
+                            ground = {},
+                            nature = {}
+                        }
+                    }
                 }
 
-                for y, row in ipairs(map.tilemap.layers["Ground"].data) do
-                    for x, tile in ipairs(row) do
-                        if tile then
-                            if not packet.ground[y] then
-                                packet.ground[y] = {}
+                local groundData = map.tilemap.layers["Ground"].data
+                local natureData = map.tilemap.layers["Nature.Nature"].data
+                for y = 1, map.tilemap.height do
+                    for x = 1, map.tilemap.width do
+                        if groundData[y] and groundData[y][x] then
+                            if not packet.map.layers.ground[y] then
+                                packet.map.layers.ground[y] = {}
                             end
+                            packet.map.layers.ground[y][x] = groundData[y][x].gid
+                        end
 
-                            packet.ground[y][x] = tile.gid
+                        if natureData[y] and natureData[y][x] then
+                            if not packet.map.layers.nature[y] then
+                                packet.map.layers.nature[y] = {}
+                            end
+                            packet.map.layers.nature[y][x] = natureData[y][x].gid
                         end
                     end
                 end

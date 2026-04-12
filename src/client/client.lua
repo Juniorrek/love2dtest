@@ -2,6 +2,8 @@ local enet = require("enet")
 local serpent = require("libraries.serpent.serpent")
 
 local map = require("src.world.map")
+local Player = require("src.entities.actors.Player")
+local camera = require("src.core.camera")
 
 local Client = {}
 
@@ -15,6 +17,9 @@ function Client.connect()
         if not Client.map.isTilemapLoaded() then
             Client.map.loadTilemap()
         end
+
+        Client.player = Player.new()
+        Client.camera = camera
     end
 end
 
@@ -43,16 +48,19 @@ function Client.update(dt)
                 print(ok)
 
                 if ok and packet.type == "map" then
-                    Client.map.ground = packet.ground
+                    Client.map.setLayerData("ground", packet.map.layers.ground)
+                    Client.map.setLayerData("nature", packet.map.layers.nature)
                 end
             end
         end
+
+        Client.camera.update(Client.player)
     end
 end
 
 function Client.draw()
-    if Client.map and Client.map.ground then
-        map.drawGroundByParameter(Client.map.ground)
+    if Client.map and Client.map.layers and Client.map.layers.ground then
+        Client.map.drawGround(Client.camera)
     end
 end
 
