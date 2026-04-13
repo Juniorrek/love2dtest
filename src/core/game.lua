@@ -1,10 +1,10 @@
-local Player = require("src.entities.actors.Player")
+local Player = require("src.shared.Player")
 local map = require("src.world.map")
 local mouse = require("src.core.mouse")
 local keyboard = require("src.core.keyboard")
 local Creatures = require("src.entities.creatures.creatures")
 local Entities = require("src.entities.entities")
-local camera = require("src.core.camera")
+local camera = require("src.client.camera")
 local conf = require("conf")
 
 local Server = require("src.server.server")

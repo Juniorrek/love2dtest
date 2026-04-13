@@ -1,9 +1,11 @@
 local enet = require("enet")
 local serpent = require("libraries.serpent.serpent")
 
-local map = require("src.world.map")
-local Player = require("src.entities.actors.Player")
-local camera = require("src.core.camera")
+local Player = require("src.shared.Player")
+local camera = require("src.client.camera")
+local MapDefinition = require("src.client.map.MapDefinition")
+local WorldState = require("src.shared.WorldState")
+local MapRenderer = require("src.client.map.MapRenderer")
 
 local Client = {}
 
@@ -12,11 +14,7 @@ function Client.connect()
         Client.host = enet.host_create()
         Client.peer = Client.host:connect("localhost:6789")
 
-        -- RELOAD THE MAP again in the client side but to use the tiles and tilesets info, not the currect state of the map/data, that I given by the server
-        Client.map = map
-        if not Client.map.isTilemapLoaded() then
-            Client.map.loadTilemap()
-        end
+        MapDefinition.load()
 
         Client.player = Player.new()
         Client.camera = camera
@@ -28,7 +26,6 @@ function Client.connected()
 end
 
 local timer = 0
-
 function Client.update(dt)
     if Client.connected() then
         local event = Client.host:service(100)
@@ -48,8 +45,7 @@ function Client.update(dt)
                 print(ok)
 
                 if ok and packet.type == "map" then
-                    Client.map.setLayerData("ground", packet.map.layers.ground)
-                    Client.map.setLayerData("nature", packet.map.layers.nature)
+                    Client.worldState = WorldState.getFromMapData(packet.map)
                 end
             end
         end
@@ -59,8 +55,8 @@ function Client.update(dt)
 end
 
 function Client.draw()
-    if Client.map and Client.map.layers and Client.map.layers.ground then
-        Client.map.drawGround(Client.camera)
+    if Client.worldState then
+        MapRenderer.drawGround(Client.worldState.layers, Client.camera)
     end
 end
 

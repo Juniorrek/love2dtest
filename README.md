@@ -36,6 +36,7 @@ The main inspiration is:
 
 ## Improvements
 
+- Server send chunks instead whole map
 - Improve things drawn in screen only in camera view
 - Replace "magic" numbers with named constants
 - Simplify player movement and interaction logic ()

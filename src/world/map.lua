@@ -5,10 +5,7 @@ local light = require("src.world.light")
 
 local sti = require("libraries.sti")
 
-local map = {
-    loaded = false,
-    tilemapLoaded = false
-}
+local map = {}
 
 function map.loadObjectsFromTiles()
     for y,v in ipairs(map.tilemap.layers["Nature.Objects"].data) do
@@ -38,23 +35,7 @@ function map.loadObjectsFromTiles()
     end
 end
 
-function map.isLoaded()
-    return map.loaded
-end
-
-function map.isTilemapLoaded()
-    return map.tilemapLoaded
-end
-
-function map.loadTilemap()
-    map.tilemap = sti("assets/map.lua")
-    map.layers = {}
-    map.loaded = true
-end
-
 function map.load()
-    map.loadTilemap()
-
     map.objects = {}
     map.loadObjectsFromTiles()
 
@@ -63,8 +44,6 @@ function map.load()
 
     map.width = map.tilemap.width * map.tilemap.tilewidth
     map.height = map.tilemap.height * map.tilemap.tileheight
-
-    map.loaded = true
 end
 
 local chopTreeSfx = love.audio.newSource("assets/audio/sfx/secretaria.mp3", "static")
@@ -177,42 +156,6 @@ function map.drawAbove(camera)
     end
 
     light.draw(map.objects)
-end
-
-function map.setLayerData(layer, data)
-    map.layers[layer] = data
-end
-
-function map.drawGround(camera)
-    local groundData = map.layers.ground
-    local natureData = map.layers.nature
-    for y = camera.startY, camera.endY do
-        for x = camera.startX, camera.endX do
-            if groundData[y] then
-                local groundTile = groundData[y][x]
-                if groundTile ~= nil then
-                    love.graphics.draw(
-                        map.tilemap.tilesets[map.tilemap.tiles[groundTile].tileset].image, 
-                        map.tilemap.tiles[groundTile].quad,
-                        (x-1) * constants.TILE_SIZE,
-                        (y-1) * constants.TILE_SIZE
-                    )
-                end
-            end
-
-            if natureData[y] then
-                local natureTile = natureData[y][x]
-                if natureTile ~= nil then
-                    love.graphics.draw(
-                        map.tilemap.tilesets[map.tilemap.tiles[natureTile].tileset].image, 
-                        map.tilemap.tiles[natureTile].quad,
-                        (x-1) * constants.TILE_SIZE,
-                        (y-1) * constants.TILE_SIZE
-                    )
-                end
-            end
-        end
-    end
 end
 
 return map
