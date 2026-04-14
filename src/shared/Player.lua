@@ -58,12 +58,19 @@ local function buildAnimations(spritesheet)
     }
 end
 
+local uidCounter = 0
+local function getUID()
+    uidCounter = uidCounter + 1
+    return uidCounter
+end
+
 -- CONSTRUCTOR
 function Player.new()
     local spritesheet = love.graphics.newImage("assets/images/actors/orcSpritesheet.png")
 
     -- TABLE INSTANCE
     local player = {
+        id = getUID(),
         hp = 100,
         position = {
             draw = {
@@ -290,8 +297,10 @@ function Player.new()
         love.graphics.draw(
             self.spritesheet,
             self:getCurrentQuad(),
-            self.position.draw.x,
-            self.position.draw.y
+            --self.position.draw.x,
+            --self.position.draw.y
+            self.position.grid.x * constants.TILE_SIZE - constants.TILE_SIZE,
+            self.position.grid.y * constants.TILE_SIZE - constants.TILE_SIZE
         )
 
         if self.attack.target then

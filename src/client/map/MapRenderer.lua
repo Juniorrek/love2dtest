@@ -3,11 +3,13 @@ local MapDefinition = require("src.client.map.MapDefinition")
 
 local MapRenderer = {}
 
-function MapRenderer.drawGround(layers, camera)
-    local groundData = layers.ground
-    local natureData = layers.nature
-    for y = camera.startY, camera.endY do
-        for x = camera.startX, camera.endX do
+function MapRenderer.drawGround(worldState)--layers, camera)
+    local groundData = worldState.layers.ground
+    local natureData = worldState.layers.nature
+    for y = 1, worldState.height do
+        for x = 1, worldState.width do 
+    --for y = camera.startY, camera.endY do
+    --    for x = camera.startX, camera.endX do
             if groundData[y] then
                 local groundTile = groundData[y][x]
                 if groundTile ~= nil then

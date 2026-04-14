@@ -7,6 +7,12 @@ The main inspiration is:
 - Tibia for graphics and map feeling
 
 ## TODO
+Make server movement continuous.
+Add a proper server-side player registry/handler.
+Separate server player creation from client visual player creation.
+Change input sending from “single key press event” to “current input state”.
+Only after that, think about client prediction/interpolation.
+
 - NETWORK
     1. Draw ground on client sent by server
     Create the base folders: src/server, src/client, src/shared.

@@ -62,7 +62,7 @@ function game.update(dt)
     Creatures.update(dt, player)
     camera.update(player) ]]
 
-    Server.update()
+    Server.update(dt)
     Client.update(dt)
 end
 
