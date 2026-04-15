@@ -20,7 +20,8 @@ function Client.connect()
 
         MapDefinition.load()
 
-        Client.inputState = InputState
+        Client.inputState = InputState.new()
+        Client.previousInputState = InputState.new()
 
         --Client.player = Player.new()
         --Client.camera = camera
@@ -34,7 +35,12 @@ end
 function Client.sendInput(input)
     local packet = {
         type = "input",
-        input = input,
+        input = {
+            up = Client.inputState.up,
+            left = Client.inputState.left,
+            down = Client.inputState.down,
+            right = Client.inputState.right
+        },
         playerId = Client.player.id
     }
 
@@ -77,20 +83,12 @@ function Client.update(dt)
 
         --Client.camera.update(Client.player)
 
-        if love.keyboard.isDown("up") or love.keyboard.isDown("w") then
-            Client.sendInput({direction = constants.DIRECTIONS.UP})
-        elseif love.keyboard.isDown("left") or love.keyboard.isDown("a") then
-            Client.sendInput({direction = constants.DIRECTIONS.LEFT})
-        elseif love.keyboard.isDown("down") or love.keyboard.isDown("s") then
-            Client.sendInput({direction = constants.DIRECTIONS.DOWN})
-        elseif love.keyboard.isDown("right") or love.keyboard.isDown("d") then
-            Client.sendInput({direction = constants.DIRECTIONS.RIGHT})
-        end
-
         Client.inputState:update()
         
-        if Client.inputState:hasChanged() then
+        if not Client.inputState:equals(Client.previousInputState) then
+            Client.previousInputState:copyFrom(Client.inputState)
             print("Input changed on client.")
+            Client.sendInput()
         end
     end
 end

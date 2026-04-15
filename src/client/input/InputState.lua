@@ -1,38 +1,35 @@
-local LastInputState = {
-    up = false,
-    down = false,
-    left = false,
-    right = false
-}
+local InputState = {}
 
-local InputState = {
-    up = false,
-    down = false,
-    left = false,
-    right = false
-}
+function InputState.new()
+    local inputState = {
+        up = false,
+        left = false,
+        down = false,
+        right = false
+    }
 
-function InputState:hasChanged()
-    local result = self.up ~= LastInputState.up or
-           self.down ~= LastInputState.down or
-           self.left ~= LastInputState.left or
-           self.right ~= LastInputState.right
-
-    if result then
-        LastInputState.up = self.up
-        LastInputState.down = self.down
-        LastInputState.left = self.left
-        LastInputState.right = self.right
+    function inputState:update()
+        self.up = love.keyboard.isDown("up") or love.keyboard.isDown("w")
+        self.down = love.keyboard.isDown("down") or love.keyboard.isDown("s")
+        self.left = love.keyboard.isDown("left") or love.keyboard.isDown("a")
+        self.right = love.keyboard.isDown("right") or love.keyboard.isDown("d")
     end
 
-    return result
-end
+    function inputState:copyFrom(otherInputState)
+        self.up = otherInputState.up
+        self.left = otherInputState.left
+        self.down = otherInputState.down
+        self.right = otherInputState.right
+    end
 
-function InputState:update()
-    self.up = love.keyboard.isDown("up") or love.keyboard.isDown("w")
-    self.down = love.keyboard.isDown("down") or love.keyboard.isDown("s")
-    self.left = love.keyboard.isDown("left") or love.keyboard.isDown("a")
-    self.right = love.keyboard.isDown("right") or love.keyboard.isDown("d")
+    function inputState:equals(otherInputState)
+        return self.up == otherInputState.up and
+                self.left == otherInputState.left and
+                self.down == otherInputState.down and
+                self.right == otherInputState.right
+    end
+
+    return inputState
 end
 
 return InputState

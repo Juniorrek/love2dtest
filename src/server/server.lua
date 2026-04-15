@@ -24,7 +24,7 @@ function Server.online()
     return Server.status == "on"
 end
 
-local player
+local player = nil
 local peers = {}
 
 function Server.update(dt)
@@ -69,14 +69,15 @@ function Server.update(dt)
                 if ok and packet.type == "input" then
                     --print("Received input: ", packet.input.direction)
 
-                    if packet.input.direction == constants.DIRECTIONS.UP then
-                        player.position.grid.y = player.position.grid.y - 1
-                    elseif packet.input.direction == constants.DIRECTIONS.LEFT then
-                        player.position.grid.x = player.position.grid.x - 1
-                    elseif packet.input.direction == constants.DIRECTIONS.DOWN then
-                        player.position.grid.y = player.position.grid.y + 1
-                    elseif packet.input.direction == constants.DIRECTIONS.RIGHT then
-                        player.position.grid.x = player.position.grid.x + 1
+                    player.desiredDirection = nil
+                    if packet.input.up then
+                        player.desiredDirection = constants.DIRECTIONS.UP
+                    elseif packet.input.left then
+                        player.desiredDirection = constants.DIRECTIONS.LEFT
+                    elseif packet.input.down then
+                        player.desiredDirection = constants.DIRECTIONS.DOWN
+                    elseif packet.input.right then
+                        player.desiredDirection = constants.DIRECTIONS.RIGHT
                     end
 
                     local packet = {
@@ -84,7 +85,8 @@ function Server.update(dt)
                         player = {
                             id = player.id,
                             hp = player.hp,
-                            position = player.position
+                            position = player.position,
+                            desiredDirection = player.desiredDirection
                         }
                     }
 
@@ -93,6 +95,10 @@ function Server.update(dt)
                     peers[1]:send(serializedString)
                 end
             end
+        end
+
+        if player then
+            player:update(dt)
         end
     end
 end

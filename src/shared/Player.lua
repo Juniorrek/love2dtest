@@ -144,7 +144,12 @@ function Player.new()
 
     function player:tryMove(x, y, direction)
         self.direction = direction
-        if map.movableTile(x, y) and Entities.isFreeAt(x, y) then
+
+        self.moving = true
+        self.targetPosition.grid.x = x
+        self.targetPosition.grid.y = y
+
+        --[[ if map.movableTile(x, y) and Entities.isFreeAt(x, y) then
             Entities.reserveTile(self, x, y)
             self.moving = true
         else 
@@ -154,7 +159,7 @@ function Player.new()
             self.moving = false
             self.animationFrame = 1
             self.animationTimer = 0
-        end
+        end ]]
     end
 
     function player:moveFromDesiredDirection()
@@ -169,14 +174,15 @@ function Player.new()
         end
     end
 
-    function player:update(dt, camera)
-        self.battleList:update(camera)
+    function player:update(dt)
+        --self.battleList:update(camera)
 
         if not self.moving and self.desiredDirection then
             self:moveFromDesiredDirection()
         end
 
         if self.moving then
+            print("Moving on server")
             self.animationTimer = self.animationTimer + dt
 
             if self.animationTimer >= self.animationSpeed then
@@ -204,6 +210,7 @@ function Player.new()
 
             if self.position.draw.x == targetDrawX and self.position.draw.y == targetDrawY then
                 Entities.commitMove(self)
+                print("Finished moving on server")
                 if not self.desiredDirection then
 
                     self.moving = false
@@ -215,14 +222,14 @@ function Player.new()
             end
         end
 
-        if self.attack.target then
+        --[[ if self.attack.target then
             if player:touchingTarget() then
                 print("BAAAAM")
                 --self:aggroPlayer(self.attack.target)
             else
                 --self.attack.target = nil
             end
-        end
+        end ]]
     end
 
     function player:touchingTarget()
