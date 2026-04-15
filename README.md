@@ -7,6 +7,16 @@ The main inspiration is:
 - Tibia for graphics and map feeling
 
 ## TODO
+Client send input state instead input event
+-Sends on event and every fixed tick rate
+Server reads, update and responds
+While, the clients predicts
+
+Later interpolation for creatures and other players
+Lag compensation maybe unnecessary
+
+
+
 Make server movement continuous.
 Add a proper server-side player registry/handler.
 Separate server player creation from client visual player creation.

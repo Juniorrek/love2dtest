@@ -7,6 +7,7 @@ local MapDefinition = require("src.client.map.MapDefinition")
 local WorldState = require("src.shared.WorldState")
 local MapRenderer = require("src.client.map.MapRenderer")
 local constants = require("src.core.constants")
+local InputState = require("src.client.input.InputState")
 
 local Client = {
     player = {}
@@ -18,6 +19,8 @@ function Client.connect()
         Client.peer = Client.host:connect("localhost:6789")
 
         MapDefinition.load()
+
+        Client.inputState = InputState
 
         --Client.player = Player.new()
         --Client.camera = camera
@@ -57,7 +60,6 @@ function Client.update(dt)
                 local serializedData = event.data
 
                 local ok, packet = serpent.load(serializedData)
-                print(ok)
 
                 if ok and packet.type == "initial" then
                     Client.worldState = WorldState.getFromMapData(packet.map)
@@ -83,6 +85,12 @@ function Client.update(dt)
             Client.sendInput({direction = constants.DIRECTIONS.DOWN})
         elseif love.keyboard.isDown("right") or love.keyboard.isDown("d") then
             Client.sendInput({direction = constants.DIRECTIONS.RIGHT})
+        end
+
+        Client.inputState:update()
+        
+        if Client.inputState:hasChanged() then
+            print("Input changed on client.")
         end
     end
 end

@@ -61,13 +61,13 @@ function Server.update(dt)
                 local serializedString = serpent.dump(packet)
                 event.peer:send(serializedString)
             elseif event.type == "receive" then
-                print("Received message: ", event.data, event.peer)
+                --print("Received message: ", event.data, event.peer)
                 
                 local serializedData = event.data
                 local ok, packet = serpent.load(serializedData)
 
                 if ok and packet.type == "input" then
-                    print("Received input: ", packet.input.direction)
+                    --print("Received input: ", packet.input.direction)
 
                     if packet.input.direction == constants.DIRECTIONS.UP then
                         player.position.grid.y = player.position.grid.y - 1
