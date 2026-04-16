@@ -174,7 +174,7 @@ function Player.new()
         end
     end
 
-    function player:update(dt)
+    function player:update(dt, callback)
         --self.battleList:update(camera)
 
         if not self.moving and self.desiredDirection then
@@ -182,7 +182,7 @@ function Player.new()
         end
 
         if self.moving then
-            print("Moving on server")
+            --print("Moving on server")
             self.animationTimer = self.animationTimer + dt
 
             if self.animationTimer >= self.animationSpeed then
@@ -210,15 +210,19 @@ function Player.new()
 
             if self.position.draw.x == targetDrawX and self.position.draw.y == targetDrawY then
                 Entities.commitMove(self)
-                print("Finished moving on server")
-                if not self.desiredDirection then
+                --print("Finished moving on server" .. self.position.grid.x)
+                --[[ if not self.desiredDirection then
 
                     self.moving = false
                     self.animationFrame = 1
                     self.animationTimer = 0
                 else
                     self:moveFromDesiredDirection()
-                end
+                end ]]
+                self.moving = false
+                self.animationFrame = 1
+                self.animationTimer = 0
+                callback()
             end
         end
 

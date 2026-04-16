@@ -74,6 +74,7 @@ function Client.update(dt)
                     Client.player.hp = packet.player.hp
                     Client.player.position = packet.player.position
                 elseif ok and packet.type == "update" then
+                    print("Client updated")
                     Client.player.id = packet.player.id
                     Client.player.hp = packet.player.hp
                     Client.player.position = packet.player.position
@@ -101,6 +102,10 @@ function Client.draw()
     if Client.player.position then
         Client.player:draw()
     end
+
+
+    local fps = love.timer.getFPS()
+    love.graphics.print("FPS: " .. tostring(fps), 10, 10)
 end
 
 return Client

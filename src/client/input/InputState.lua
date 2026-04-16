@@ -9,10 +9,18 @@ function InputState.new()
     }
 
     function inputState:update()
+        --print("a")
         self.up = love.keyboard.isDown("up") or love.keyboard.isDown("w")
         self.down = love.keyboard.isDown("down") or love.keyboard.isDown("s")
         self.left = love.keyboard.isDown("left") or love.keyboard.isDown("a")
         self.right = love.keyboard.isDown("right") or love.keyboard.isDown("d")
+
+       --[[  if  love.keyboard.isDown("up") or love.keyboard.isDown("w") or
+            love.keyboard.isDown("down") or love.keyboard.isDown("s") or
+            love.keyboard.isDown("left") or love.keyboard.isDown("a") or
+            love.keyboard.isDown("right") or love.keyboard.isDown("d") then
+            print("a")
+        end ]]
     end
 
     function inputState:copyFrom(otherInputState)

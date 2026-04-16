@@ -7,6 +7,147 @@ The main inspiration is:
 - Tibia for graphics and map feeling
 
 ## TODO
+
+MERGEMERGEMERGE
+
+ Stabilize the current network movement
+Do this first, before prediction.
+
+Fix the FPS/blocking issue.
+Why:
+Right now low FPS makes all movement debugging confusing. If the game drops from 60 to 5 FPS, it becomes hard to know whether the bug is networking or just frame stalls.
+
+Finish the authoritative movement flow.
+Why:
+The server should be the source of truth before you add client-side tricks.
+
+Make hold-to-walk work correctly with inputState.
+Why:
+You already moved away from “one persistent intention”, which is good. Now you need a clean rule for:
+
+press
+hold
+release
+tile boundary continue/stop
+Make the client render movement smoothly from server data.
+Why:
+Even without prediction, smooth drawing already improves feel a lot.
+
+Only then evaluate prediction.
+Why:
+Prediction is easier when the base system is already correct.
+
+Phase 1: Fix what is broken now
+This should be your immediate focus.
+
+Remove blocking network polling from the frame loop.
+Make client input sending consistent with server input freshness rules.
+Make tile-boundary movement decisions fully server-side.
+Make sure one tap never becomes endless walking.
+Make sure holding a key keeps walking.
+This phase is done when:
+
+FPS stays stable after F1
+tap walks a controlled amount
+hold keeps moving
+release stops at the next correct boundary
+Phase 2: Clean multiplayer foundation
+After movement feels correct for one player, organize the server/client roles better.
+
+Add a real server-side player registry.
+Why:
+Right now the code looks close to “one global player”. Multiplayer will be much easier if the server owns players by peer/client id.
+
+Separate server player state from client visual player objects.
+Why:
+The server version should care about simulation.
+The client version should care about drawing and interpolation.
+
+Add a small shared protocol module.
+Why:
+Packet names like "initial" and "update" should live in one place.
+
+Make the server broadcast all relevant player states.
+Why:
+That is the base for remote players.
+
+This phase is done when:
+
+each connected client gets its own server player
+clients know which player is “me”
+clients can also see other players
+Phase 3: Improve movement presentation
+This is where the game starts feeling nicer, not just correct.
+
+Draw from interpolated/smoothed position instead of snapping only by grid.
+Add interpolation for other players.
+Add interpolation later for creatures too.
+Why:
+For remote entities, interpolation is usually simpler and safer than prediction.
+
+This phase is done when:
+
+local movement looks smooth
+remote players do not teleport tile by tile
+Phase 4: Decide if you really need prediction
+Only do this after the previous phases.
+
+Prediction is useful if:
+
+local movement still feels delayed
+you want movement to begin instantly on the client
+Prediction is not necessary yet if:
+
+localhost already feels good
+your game is tile-based and slower-paced
+For your project, I think:
+
+interpolation for remote entities is very important
+prediction for local player is optional, but nice later
+lag compensation for combat is probably unnecessary for now
+A simpler roadmap from your notes
+
+Now
+Fix FPS/blocking
+Finish authoritative tile movement
+Fix input state send/hold/release
+Make stop/continue happen only at tile boundaries
+Smooth client drawing
+Next
+Server player registry
+Shared protocol file
+Separate simulation player from render player
+Broadcast all player positions
+Test with 2 localhost clients
+Later
+Interpolation for remote players
+Interpolation for creatures
+Optional local prediction
+Chunked map sending
+Camera-based rendering optimization
+Much later
+Combat improvements
+Interaction cleanup
+Hunger/berries
+Bush hiding
+Better mouse system
+World/character structure
+
+
+
+MERGEMERGEMERGE
+
+
+
+
+
+Fix the FPS/blocking issue.
+Fix input handling so the server stores inputState, not only a persistent desiredDirection.
+Make the server decide “continue or stop” from the latest stored input state at tile boundaries.
+Make the client draw movement smoothly.
+Only after that, add prediction if you still want more responsiveness.
+
+
 Client send input state instead input event
 -Sends on event and every fixed tick rate
 Server reads, update and responds

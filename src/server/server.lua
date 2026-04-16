@@ -10,6 +10,26 @@ local Server = {
     status = "off"
 }
 
+
+local function getDirectionFromInput(inputState)
+    if inputState.up then
+        return constants.DIRECTIONS.UP
+    elseif inputState.left then
+        return constants.DIRECTIONS.LEFT
+    elseif inputState.down then
+        return constants.DIRECTIONS.DOWN
+    elseif inputState.right then
+        return constants.DIRECTIONS.RIGHT
+    end
+
+    return nil
+end
+local function hasFreshInput(player)
+    local now = love.timer.getTime()
+    return (now - player.lastInputTime) < 0.25
+end
+
+
 function Server.start()
     if not Server.online() then
         Server.host = enet.host_create("localhost:6789")
@@ -68,6 +88,8 @@ function Server.update(dt)
 
                 if ok and packet.type == "input" then
                     --print("Received input: ", packet.input.direction)
+                    player.inputState = packet.input
+                    player.lastInputTime = love.timer.getTime()
 
                     player.desiredDirection = nil
                     if packet.input.up then
@@ -80,6 +102,39 @@ function Server.update(dt)
                         player.desiredDirection = constants.DIRECTIONS.RIGHT
                     end
 
+                    --[[ local packet = {
+                        type = "update",
+                        player = {
+                            id = player.id,
+                            hp = player.hp,
+                            position = player.position,
+                            desiredDirection = player.desiredDirection
+                        }
+                    }
+
+                    --SERPENT   
+                    local serializedString = serpent.dump(packet)
+                    peers[1]:send(serializedString) ]]
+                end
+            end
+        end
+
+        if player then
+            player:update(dt, function() 
+                local nextDirection = nil
+
+                if hasFreshInput(player) then
+                    nextDirection = getDirectionFromInput(player.inputState)
+                end
+
+                if nextDirection then
+                    --player:startMove(nextDirection)
+                    --print("Continuing")
+                    player.desiredDirection = nextDirection
+                else
+                    --print("Stoping")
+                    --player:stopMove()
+                    player.desiredDirection = nil
                     local packet = {
                         type = "update",
                         player = {
@@ -94,11 +149,7 @@ function Server.update(dt)
                     local serializedString = serpent.dump(packet)
                     peers[1]:send(serializedString)
                 end
-            end
-        end
-
-        if player then
-            player:update(dt)
+            end)
         end
     end
 end
