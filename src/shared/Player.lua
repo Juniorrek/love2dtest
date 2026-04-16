@@ -182,7 +182,6 @@ function Player.new()
         end
 
         if self.moving then
-            --print("Moving on server")
             self.animationTimer = self.animationTimer + dt
 
             if self.animationTimer >= self.animationSpeed then
@@ -210,7 +209,6 @@ function Player.new()
 
             if self.position.draw.x == targetDrawX and self.position.draw.y == targetDrawY then
                 Entities.commitMove(self)
-                --print("Finished moving on server" .. self.position.grid.x)
                 --[[ if not self.desiredDirection then
 
                     self.moving = false

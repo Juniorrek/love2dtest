@@ -49,19 +49,13 @@ function Client.sendInput(input)
     Client.peer:send(serializedString)
 end
 
-local timer = 0
+local inputStateTimer = 0
 function Client.update(dt)
     if Client.connected() then
-        local event = Client.host:service(100)
-        timer = timer + dt
-
-        if timer > 2 then
-            Client.peer:send("Hi")
-            timer = 0
-        end
+        local event = Client.host:service(0)
 
         --Messages from server
-        if event then
+        while event do
             if event.type == "receive" then
                 local serializedData = event.data
 
@@ -74,22 +68,32 @@ function Client.update(dt)
                     Client.player.hp = packet.player.hp
                     Client.player.position = packet.player.position
                 elseif ok and packet.type == "update" then
-                    print("Client updated")
                     Client.player.id = packet.player.id
                     Client.player.hp = packet.player.hp
                     Client.player.position = packet.player.position
                 end
             end
+
+            event = Client.host:service(0)
         end
 
         --Client.camera.update(Client.player)
 
         Client.inputState:update()
-        
-        if not Client.inputState:equals(Client.previousInputState) then
+
+        local inputChanged = not Client.inputState:equals(Client.previousInputState)
+        local hasActiveInput = Client.inputState:hasMovementInput()
+
+        if inputChanged then
             Client.previousInputState:copyFrom(Client.inputState)
-            print("Input changed on client.")
             Client.sendInput()
+            inputStateTimer = 0
+        elseif hasActiveInput then
+            inputStateTimer = inputStateTimer + dt
+            if inputStateTimer >= 0.1 then
+                inputStateTimer = 0
+                Client.sendInput()
+            end
         end
     end
 end

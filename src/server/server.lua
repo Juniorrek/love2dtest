@@ -49,9 +49,9 @@ local peers = {}
 
 function Server.update(dt)
     if Server.online() then
-        local event = Server.host:service(100)
+        local event = Server.host:service(0)
 
-        if event then
+        while event do
             if event.type == "connect" then
                 print(event.peer, "connected.")
                 table.insert(peers, event.peer)
@@ -81,13 +81,10 @@ function Server.update(dt)
                 local serializedString = serpent.dump(packet)
                 event.peer:send(serializedString)
             elseif event.type == "receive" then
-                --print("Received message: ", event.data, event.peer)
-                
                 local serializedData = event.data
                 local ok, packet = serpent.load(serializedData)
 
                 if ok and packet.type == "input" then
-                    --print("Received input: ", packet.input.direction)
                     player.inputState = packet.input
                     player.lastInputTime = love.timer.getTime()
 
@@ -117,6 +114,8 @@ function Server.update(dt)
                     peers[1]:send(serializedString) ]]
                 end
             end
+
+            event = Server.host:service(0)
         end
 
         if player then
@@ -128,27 +127,24 @@ function Server.update(dt)
                 end
 
                 if nextDirection then
-                    --player:startMove(nextDirection)
-                    --print("Continuing")
                     player.desiredDirection = nextDirection
                 else
-                    --print("Stoping")
-                    --player:stopMove()
                     player.desiredDirection = nil
-                    local packet = {
-                        type = "update",
-                        player = {
-                            id = player.id,
-                            hp = player.hp,
-                            position = player.position,
-                            desiredDirection = player.desiredDirection
-                        }
-                    }
-
-                    --SERPENT   
-                    local serializedString = serpent.dump(packet)
-                    peers[1]:send(serializedString)
                 end
+
+                local packet = {
+                    type = "update",
+                    player = {
+                        id = player.id,
+                        hp = player.hp,
+                        position = player.position,
+                        desiredDirection = player.desiredDirection
+                    }
+                }
+
+                --SERPENT   
+                local serializedString = serpent.dump(packet)
+                peers[1]:send(serializedString)
             end)
         end
     end
