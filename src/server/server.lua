@@ -5,29 +5,11 @@ local World = require("src.server.World")
 local Entities = require("src.entities.entities")
 local Player = require("src.shared.Player")
 local constants = require("src.core.constants")
+local protocol = require("src.shared.protocol")
 
 local Server = {
     status = "off"
 }
-
-
-local function getDirectionFromInput(inputState)
-    if inputState.up then
-        return constants.DIRECTIONS.UP
-    elseif inputState.left then
-        return constants.DIRECTIONS.LEFT
-    elseif inputState.down then
-        return constants.DIRECTIONS.DOWN
-    elseif inputState.right then
-        return constants.DIRECTIONS.RIGHT
-    end
-
-    return nil
-end
-local function hasFreshInput(player)
-    local now = love.timer.getTime()
-    return (now - player.lastInputTime) < 0.25
-end
 
 
 function Server.start()
@@ -47,109 +29,90 @@ end
 local player = nil
 local peers = {}
 
-function Server.update(dt)
-    if Server.online() then
-        local event = Server.host:service(0)
+function Server.pollNetwork()
+    local event = Server.host:service(0)
+    while event do
+        if event.type == "connect" then
+            print(event.peer, "connected.")
+            table.insert(peers, event.peer)
 
-        while event do
-            if event.type == "connect" then
-                print(event.peer, "connected.")
-                table.insert(peers, event.peer)
+            player = Player.new()
+            player.lastProcessedInputSequence = 0
+            Entities.new(player)
 
-                player = Player.new()
-                Entities.new(player)
-
-                local packet = {
-                    type = "initial",
-                    map = {
-                        width = World.state.width,
-                        height = World.state.height,
-                        layers = {
-                            ground = World.state.layers.ground,
-                            nature = World.state.layers.nature
-                        },
-
+            local packet = {
+                type = protocol.INITIAL,
+                map = {
+                    width = World.state.width,
+                    height = World.state.height,
+                    layers = {
+                        ground = World.state.layers.ground,
+                        nature = World.state.layers.nature
                     },
-                    player = {
-                        id = player.id,
-                        hp = player.hp,
-                        position = player.position
-                    }
+
+                },
+                player = {
+                    id = player.id,
+                    hp = player.hp,
+                    position = player.position
                 }
+            }
 
-                --SERPENT   
-                local serializedString = serpent.dump(packet)
-                event.peer:send(serializedString)
-            elseif event.type == "receive" then
-                local serializedData = event.data
-                local ok, packet = serpent.load(serializedData)
+            --SERPENT   
+            local serializedString = serpent.dump(packet)
+            event.peer:send(serializedString)
+        elseif event.type == "receive" then
+            local serializedData = event.data
+            local ok, packet = serpent.load(serializedData)
 
-                if ok and packet.type == "input" then
-                    player.inputState = packet.input
+            if ok and packet.type == protocol.INPUT then
+                if player then
+                    player.lastestInputState = packet.input
                     player.lastInputTime = love.timer.getTime()
-
-                    player.desiredDirection = nil
-                    if packet.input.up then
-                        player.desiredDirection = constants.DIRECTIONS.UP
-                    elseif packet.input.left then
-                        player.desiredDirection = constants.DIRECTIONS.LEFT
-                    elseif packet.input.down then
-                        player.desiredDirection = constants.DIRECTIONS.DOWN
-                    elseif packet.input.right then
-                        player.desiredDirection = constants.DIRECTIONS.RIGHT
-                    end
-
-                    --[[ local packet = {
-                        type = "update",
-                        player = {
-                            id = player.id,
-                            hp = player.hp,
-                            position = player.position,
-                            desiredDirection = player.desiredDirection
-                        }
-                    }
-
-                    --SERPENT   
-                    local serializedString = serpent.dump(packet)
-                    peers[1]:send(serializedString) ]]
+                    player.lastProcessedInputSequence = packet.sequence
                 end
             end
-
-            event = Server.host:service(0)
         end
 
-        if player then
-            player:update(dt, function() 
-                local nextDirection = nil
+        event = Server.host:service(0)
+    end
+end
 
-                if hasFreshInput(player) then
-                    nextDirection = getDirectionFromInput(player.inputState)
-                end
+function Server.sendPlayerUpdate(player, peer)
+    local packet = {
+        type = protocol.UPDATE,
+        player = {
+            id = player.id,
+            hp = player.hp,
+            position = player.position,
+            targetPosition = player.targetPosition,
+            desiredDirection = player.desiredDirection,
+            direction = player.direction,
+            moving = player.moving
+        },
+        lastProcessedInputSequence = player.lastProcessedInputSequence
+    }
 
-                player.moving = false
-                if nextDirection then
-                    player.desiredDirection = nextDirection
-                else
-                    player.desiredDirection = nil
-                    player.animationFrame = 1
-                    player.animationTimer = 0
-                end
+    --SERPENT   
+    local serializedString = serpent.dump(packet)
+    peer:send(serializedString)
+end
 
-                local packet = {
-                    type = "update",
-                    player = {
-                        id = player.id,
-                        hp = player.hp,
-                        position = player.position,
-                        desiredDirection = player.desiredDirection
-                    }
-                }
+function Server.updatePlayers(dt)
+    if player and player.lastestInputState then
+        player.desiredDirection = Player.getDirectionFromInput(player.lastestInputState, true, player.lastInputTime)
 
-                --SERPENT   
-                local serializedString = serpent.dump(packet)
-                peers[1]:send(serializedString)
-            end)
-        end
+        player:update(dt, function ()
+            Server.sendPlayerUpdate(player, peers[1])
+        end)
+    end
+end
+
+function Server.update(dt)
+    if Server.online() then
+        Server.pollNetwork()
+
+        Server.updatePlayers(dt)
     end
 end
 

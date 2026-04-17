@@ -58,6 +58,27 @@ local function buildAnimations(spritesheet)
     }
 end
 
+function Player.hasFreshInput(lastInputTime)
+    local now = love.timer.getTime()
+    return (now - lastInputTime) < 0.35
+end
+function Player.getDirectionFromInput(inputState, fallback, lastInputTime)
+    lastInputTime = lastInputTime or 0
+    if not fallback or Player.hasFreshInput(lastInputTime) then -- Fallback if last "false" packet is lost
+        if inputState.up then
+            return constants.DIRECTIONS.UP
+        elseif inputState.left then
+            return constants.DIRECTIONS.LEFT
+        elseif inputState.down then
+            return constants.DIRECTIONS.DOWN
+        elseif inputState.right then
+            return constants.DIRECTIONS.RIGHT
+        end
+    end
+
+    return nil
+end
+
 local uidCounter = 0
 local function getUID()
     uidCounter = uidCounter + 1
@@ -135,6 +156,15 @@ function Player.new()
         end
     end
 
+    function player:stopMoving()
+        self.moving = false
+        self.animationFrame = 1
+        self.animationTimer = 0
+
+        self.desiredDirection = nil
+        self.targetPosition.grid.x = self.position.grid.x
+        self.targetPosition.grid.y = self.position.grid.y
+    end
 
     function player:getCurrentQuad()
         local state = self.moving and "walk" or "idle"
@@ -182,17 +212,6 @@ function Player.new()
         end
 
         if self.moving then
-            self.animationTimer = self.animationTimer + dt
-
-            if self.animationTimer >= self.animationSpeed then
-                self.animationTimer = 0
-                self.animationFrame = self.animationFrame + 1
-
-                if self.animationFrame > 2 then
-                    self.animationFrame = 1
-                end
-            end
-
             local move = self.speed * dt * constants.TILE_SIZE
             local targetDrawX = (self.targetPosition.grid.x-1) * constants.TILE_SIZE
             local targetDrawY = (self.targetPosition.grid.y-1) * constants.TILE_SIZE
@@ -208,16 +227,19 @@ function Player.new()
             end
 
             if self.position.draw.x == targetDrawX and self.position.draw.y == targetDrawY then
-                Entities.commitMove(self)
-                --[[ if not self.desiredDirection then
+                self.position.grid.x = self.targetPosition.grid.x
+                self.position.grid.y = self.targetPosition.grid.y
+                --Entities.commitMove(self)
 
-                    self.moving = false
-                    self.animationFrame = 1
-                    self.animationTimer = 0
+                if not self.desiredDirection then
+                    self:stopMoving()
                 else
                     self:moveFromDesiredDirection()
-                end ]]
-                callback()
+                end
+
+                if callback then
+                    callback()
+                end
             end
         end
 
@@ -229,6 +251,21 @@ function Player.new()
                 --self.attack.target = nil
             end
         end ]]
+    end
+
+    function player:updateAnimation(dt)
+        if self.moving then
+            self.animationTimer = self.animationTimer + dt
+
+            if self.animationTimer >= self.animationSpeed then
+                self.animationTimer = 0
+                self.animationFrame = self.animationFrame + 1
+
+                if self.animationFrame > 2 then
+                    self.animationFrame = 1
+                end
+            end
+        end
     end
 
     function player:touchingTarget()

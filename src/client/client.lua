@@ -8,6 +8,7 @@ local WorldState = require("src.shared.WorldState")
 local MapRenderer = require("src.client.map.MapRenderer")
 local constants = require("src.core.constants")
 local InputState = require("src.client.input.InputState")
+local protocol = require("src.shared.protocol")
 
 local Client = {
     player = {}
@@ -32,92 +33,127 @@ function Client.connected()
     return Client.peer
 end
 
-function Client.sendInput(input)
+local inputSequence = 0
+local pendingInputs = {}
+function Client.sendInput()
+    inputSequence = inputSequence + 1
+
+    local inputSnapshot = {
+        up = Client.inputState.up,
+        left = Client.inputState.left,
+        down = Client.inputState.down,
+        right = Client.inputState.right
+    }
+
     local packet = {
-        type = "input",
-        input = {
-            up = Client.inputState.up,
-            left = Client.inputState.left,
-            down = Client.inputState.down,
-            right = Client.inputState.right
-        },
+        type = protocol.INPUT,
+        sequence = inputSequence,
+        input = inputSnapshot,
         playerId = Client.player.id
     }
 
     --SERPENT   
     local serializedString = serpent.dump(packet)
     Client.peer:send(serializedString)
+
+    table.insert(pendingInputs, {
+        sequence = inputSequence,
+        input = inputSnapshot
+    })
+end
+
+local reconciledDirectionForThisFrame = nil
+function Client.pollNetwork()
+    local event = Client.host:service(0)
+    --Messages from server
+    while event do
+        if event.type == "receive" then
+            local serializedData = event.data
+
+            local ok, packet = serpent.load(serializedData)
+
+            if ok and packet.type == protocol.INITIAL then
+                Client.worldState = WorldState.getFromMapData(packet.map)
+                Client.player = Player.new() -- Refactor so server create in a way and the client just instantiates it with the data and have the functions like draw.
+                Client.player.id = packet.player.id
+                Client.player.hp = packet.player.hp
+                Client.player.position = packet.player.position
+            elseif ok and packet.type == protocol.UPDATE then
+                Client.player.id = packet.player.id
+                Client.player.hp = packet.player.hp
+
+                -- DAMMNED RECONCILIATION !!!!!
+                Client.player.position.grid.x = packet.player.position.grid.x
+                Client.player.position.grid.y = packet.player.position.grid.y
+                Client.player.position.draw.x = packet.player.position.draw.x
+                Client.player.position.draw.y = packet.player.position.draw.y
+
+                Client.player.targetPosition.grid.x = packet.player.targetPosition.grid.x
+                Client.player.targetPosition.grid.y = packet.player.targetPosition.grid.y
+                Client.player.desiredDirection = packet.player.desiredDirection
+                Client.player.direction = packet.player.direction
+                Client.player.moving = packet.player.moving
+
+                local lastProcessedInputSequence = packet.lastProcessedInputSequence
+                while #pendingInputs > 0 and pendingInputs[1].sequence <= lastProcessedInputSequence do
+                    table.remove(pendingInputs, 1)
+                end
+
+                local latestPending = pendingInputs[#pendingInputs]
+                if latestPending then
+                    reconciledDirectionForThisFrame = Player.getDirectionFromInput(latestPending.input, false)
+                else
+                    reconciledDirectionForThisFrame = nil
+                end
+            end
+        end
+
+        event = Client.host:service(0)
+    end
 end
 
 local inputStateTimer = 0
+function Client.handleInput(dt)
+    Client.inputState:update()
+    local inputChanged = not Client.inputState:equals(Client.previousInputState)
+    local hasActiveInput = Client.inputState:hasMovementInput()
+    if inputChanged then
+        Client.previousInputState:copyFrom(Client.inputState)
+        Client.sendInput()
+        inputStateTimer = 0
+    elseif hasActiveInput then
+        inputStateTimer = inputStateTimer + dt
+        if inputStateTimer >= 0.1 then
+            inputStateTimer = 0
+            Client.sendInput()
+        end
+    end
+end
+
+function Client.predictLocalPlayer(dt)
+     --Client.camera.update(Client.player)
+
+    if Client.player.id then
+        Client.player:update(dt)
+        Client.player:updateAnimation(dt)
+    end
+end
+
 function Client.update(dt)
     if Client.connected() then
-        local event = Client.host:service(0)
+        Client.pollNetwork()
 
-        --Messages from server
-        while event do
-            if event.type == "receive" then
-                local serializedData = event.data
-
-                local ok, packet = serpent.load(serializedData)
-
-                if ok and packet.type == "initial" then
-                    Client.worldState = WorldState.getFromMapData(packet.map)
-                    Client.player = Player.new() -- Refactor so server create in a way and the client just instantiates it with the data and have the functions like draw.
-                    Client.player.id = packet.player.id
-                    Client.player.hp = packet.player.hp
-                    Client.player.position = packet.player.position
-                elseif ok and packet.type == "update" then
-                    Client.player.id = packet.player.id
-                    Client.player.hp = packet.player.hp
-                    Client.player.position = packet.player.position
-                end
-            end
-
-            event = Client.host:service(0)
-        end
-
-        --Client.camera.update(Client.player)
-
-        Client.inputState:update()
-
-        local inputChanged = not Client.inputState:equals(Client.previousInputState)
-        local hasActiveInput = Client.inputState:hasMovementInput()
-
-        if inputChanged then
-            Client.previousInputState:copyFrom(Client.inputState)
-            Client.sendInput()
-            inputStateTimer = 0
-        elseif hasActiveInput then
-            inputStateTimer = inputStateTimer + dt
-            if inputStateTimer >= 0.1 then
-                inputStateTimer = 0
-                Client.sendInput()
-            end
-        end
+        Client.handleInput(dt)
 
         if Client.player.id then
-            Client.player.desiredDirection = nil
-            if Client.inputState.up then
-                Client.player.desiredDirection = constants.DIRECTIONS.UP
-            elseif Client.inputState.left then
-                Client.player.desiredDirection = constants.DIRECTIONS.LEFT
-            elseif Client.inputState.down then
-                Client.player.desiredDirection = constants.DIRECTIONS.DOWN
-            elseif Client.inputState.right then
-                Client.player.desiredDirection = constants.DIRECTIONS.RIGHT
+            if reconciledDirectionForThisFrame ~= nil then
+                Client.player.desiredDirection = reconciledDirectionForThisFrame
+                reconciledDirectionForThisFrame = nil
+            else
+                Client.player.desiredDirection = Player.getDirectionFromInput(Client.inputState, false)
             end
-
-            Client.player:update(dt, function()
-                Client.player.moving = false
-                if not Client.player.desiredDirection then
-                    Client.player.animationFrame = 1
-                    Client.player.animationTimer = 0
-                else
-                    Client.player:moveFromDesiredDirection()
-                end
-            end)
         end
+        Client.predictLocalPlayer(dt)
     end
 end
 
