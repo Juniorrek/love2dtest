@@ -126,10 +126,13 @@ function Server.update(dt)
                     nextDirection = getDirectionFromInput(player.inputState)
                 end
 
+                player.moving = false
                 if nextDirection then
                     player.desiredDirection = nextDirection
                 else
                     player.desiredDirection = nil
+                    player.animationFrame = 1
+                    player.animationTimer = 0
                 end
 
                 local packet = {

@@ -95,6 +95,29 @@ function Client.update(dt)
                 Client.sendInput()
             end
         end
+
+        if Client.player.id then
+            Client.player.desiredDirection = nil
+            if Client.inputState.up then
+                Client.player.desiredDirection = constants.DIRECTIONS.UP
+            elseif Client.inputState.left then
+                Client.player.desiredDirection = constants.DIRECTIONS.LEFT
+            elseif Client.inputState.down then
+                Client.player.desiredDirection = constants.DIRECTIONS.DOWN
+            elseif Client.inputState.right then
+                Client.player.desiredDirection = constants.DIRECTIONS.RIGHT
+            end
+
+            Client.player:update(dt, function()
+                Client.player.moving = false
+                if not Client.player.desiredDirection then
+                    Client.player.animationFrame = 1
+                    Client.player.animationTimer = 0
+                else
+                    Client.player:moveFromDesiredDirection()
+                end
+            end)
+        end
     end
 end
 

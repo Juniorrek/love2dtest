@@ -217,9 +217,6 @@ function Player.new()
                 else
                     self:moveFromDesiredDirection()
                 end ]]
-                self.moving = false
-                self.animationFrame = 1
-                self.animationTimer = 0
                 callback()
             end
         end
@@ -306,10 +303,10 @@ function Player.new()
         love.graphics.draw(
             self.spritesheet,
             self:getCurrentQuad(),
-            --self.position.draw.x,
-            --self.position.draw.y
-            self.position.grid.x * constants.TILE_SIZE - constants.TILE_SIZE,
-            self.position.grid.y * constants.TILE_SIZE - constants.TILE_SIZE
+            self.position.draw.x,
+            self.position.draw.y
+            --self.position.grid.x * constants.TILE_SIZE - constants.TILE_SIZE,
+            --self.position.grid.y * constants.TILE_SIZE - constants.TILE_SIZE
         )
 
         if self.attack.target then
